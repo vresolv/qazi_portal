@@ -1,0 +1,59 @@
+.container {
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: black;
+}
+
+.container video {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    object-fit: cover;
+    z-index: 0;
+    opacity: .2;
+  }
+
+.subContainer {
+    z-index: 1;
+    position: relative;
+    width: 50%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10%;
+}
+
+.subContainer img{
+    width: 50%;
+}
+
+.loginBtn {
+    width: 30%;
+    height: 10%;
+    border-radius: 20px;
+    border-color: transparent;
+    font-weight: bold;
+    font-size: x-large;
+    background-color: #c5a683;
+    color: white;
+}
+
+.inputBox {
+    width: 40%;
+    height: 8%;
+    font-weight: bold;
+    font-size: large;
+    border-radius: 15px;
+    padding-left: 20px;
+}
+
+.inputBox:focus {
+    outline: none;
+}
