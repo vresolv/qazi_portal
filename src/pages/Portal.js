@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styles from './Portal.module.css';
 import NavBar from '../components/portal/Nav';
 import Litigation from '../components/portal/Litigation';
+import LegalAnalysis from '../components/portal/LegalAnalysis';
+import Cases from '../components/portal/Cases';
 import dashboardIcon from '../assets/Portal/dashboard.png';
 import litigationIcon from '../assets/Portal/litigation.png';
 import legalIcon from '../assets/Portal/legal.png';
@@ -43,6 +45,8 @@ const Portal = () => {
                     </div>
                 </div>
             {selectedButton === 2 && <Litigation />}
+            {selectedButton === 3 && <LegalAnalysis />}
+            {selectedButton === 4 && <Cases />}
             </div>
         </div>
     );
