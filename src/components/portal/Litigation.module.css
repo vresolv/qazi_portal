@@ -16,6 +16,7 @@
     flex-direction: column;
     align-items: center;
     gap: 1%;
+
 }
 
 .buttonsArea {
@@ -55,13 +56,12 @@
 .aiText {
     width: 100%;
     height: 30%;
-    border-radius: 5px;
     font-family: 'Poppins', sans-serif;
     font-size: large;
-}
-
-.aiText:focus {
-    outline: none;
+    white-space: pre-wrap;
+    border: 1px solid black;
+    border-radius: 5px;
+    overflow-y: auto;
 }
 
 .genBtn {

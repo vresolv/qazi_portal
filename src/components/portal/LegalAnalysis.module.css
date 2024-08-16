@@ -132,10 +132,10 @@
     border-radius: 5px;
     font-family: 'Poppins', sans-serif;
     font-size: large;
-}
-
-.aiText:focus {
-    outline: none;
+    white-space: pre-wrap;
+    border: 1px solid red;
+    border-radius: 5px;
+    overflow-y: auto;
 }
 
 .fileTable {

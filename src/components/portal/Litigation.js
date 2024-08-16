@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './Litigation.module.css';
 
 const Litigation = () => {
-    const [paragraph, setParagraph] = useState('');
+    const [paragraph, setParagraph] = useState('Your Analysis will appear here.');
     const [pdfFile, setPdfFile] = useState(null);
     const [fileName, setFileName] = useState('');
 
@@ -45,6 +45,10 @@ You are directed to appear before this Court in the above-titled case personally
         setParagraph(notice)
       };
 
+      const renderHTML = () => {
+        return { __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') };
+      };
+
     return (
         <div className={styles.container}> 
             <div className={styles.subContainer}>
@@ -53,6 +57,7 @@ You are directed to appear before this Court in the above-titled case personally
                     <button>Petition</button>
                     <select className={styles.dropdown}>
                         <option value="option1">Preset/Template</option>
+                        <option value="option2">Summon Notice Template</option>
                     </select>
                 </div>
                 <p>AI Text Prompt</p>
@@ -73,7 +78,10 @@ You are directed to appear before this Court in the above-titled case personally
                     <button className={styles.genBtn} onClick={genGptResponse}>Generate</button>
                     </div>
                     <p>Generation Results</p>
-                <textarea className={styles.aiText} placeholder="Your Analysis will appear here." value={paragraph} readOnly></textarea>
+                    <div
+                        className={styles.aiText}
+                        dangerouslySetInnerHTML={renderHTML()}
+                    ></div>
                 <div className={styles.buttonsArea}>
                     <button className={styles.genBtn}>Download Document</button>
                 </div>
