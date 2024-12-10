@@ -71,3 +71,20 @@
 .fileUpload {
     display: none;
 }
+
+.noticeBtn {
+    background-color: #274464;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: large;
+    border-color: transparent;
+    border-radius: 10px;
+    height: 90%;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.green {
+    background-color: green !important;
+    color: white;
+}

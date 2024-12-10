@@ -7,11 +7,16 @@ import bgVideo from '../assets/LogInPage/home_bg_video.mp4'
 const LogInPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
   
     const handleLogIn = () => {
-        navigate('/portal');
-        };
+        if (username === 'admin' && password === 'admin') {
+            navigate('/portal');
+        } else {
+            setErrorMessage('Invalid username or password');
+        }
+    };
 
     return (
         <div className={styles.container}> 
@@ -32,6 +37,9 @@ const LogInPage = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     className={styles.inputBox}
                 />
+                <div className={styles.errorContainer}>
+                    {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+                </div>
                 <button className={styles.loginBtn} onClick={handleLogIn}>
                     Log in
                 </button>

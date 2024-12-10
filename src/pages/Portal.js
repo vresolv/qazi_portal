@@ -23,7 +23,7 @@ const Portal = () => {
             <NavBar />
             <div className={styles.portalArea}>
                 <div className={styles.portalMenu}>
-                    <div className={selectedButton === 1 ? styles.menuButtonAreaSelected : styles.menuButtonArea} onClick={() => handleMenuChange(1)}>
+                    <div className={selectedButton === 1 ? styles.menuButtonAreaSelected : styles.menuButtonArea}>
                         <img className={styles.buttonIcon} src={dashboardIcon} alt="Logo" />
                         <p className={styles.menuButton}>Dashboard</p>
                     </div>
@@ -39,7 +39,7 @@ const Portal = () => {
                         <img className={styles.buttonIcon} src={casesIcon} alt="Logo" />
                         <p className={styles.menuButton}>Cases</p>
                     </div>
-                    <div className={selectedButton === 5 ? styles.menuButtonAreaSelected : styles.menuButtonArea} onClick={() => handleMenuChange(5)}>
+                    <div className={selectedButton === 5 ? styles.menuButtonAreaSelected : styles.menuButtonArea}>
                         <img className={styles.buttonIcon} src={settingsIcon} alt="Logo" />
                         <p className={styles.menuButton}>Settings</p>
                     </div>
