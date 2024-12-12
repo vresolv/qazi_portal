@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import styles from './Litigation.module.css';
+import Notification from './Notification';
+
+
 
 const Litigation = () => {
     const [pdfFile, setPdfFile] = useState(null);
@@ -9,8 +12,11 @@ const Litigation = () => {
     const [isNoticeClicked, setIsNoticeClicked] = useState(false);
     const [aiText, setAiText] = useState('');
     const [generatedResults, setGeneratedResults] = useState('');
+    const [notification, setNotification] = useState(null);
     
-
+    const showNotification = (message, type = 'info') => {
+        setNotification({ message, type });
+    };
     
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -18,7 +24,7 @@ const Litigation = () => {
           setPdfFile(file);
           setFileName(file.name);
         } else {
-          alert('Please upload a valid PDF file.');
+          showNotification('Please upload a valid PDF file.','error');
           setPdfFile(null);
           setFileName(null);
         }
@@ -52,7 +58,7 @@ const Litigation = () => {
     
         const handleDownloadDocument = () => {
             if (!generatedResults) {
-                alert('No content available in the Generated Results area.');
+                showNotification('No content available in the Generated Results area.','error');
                 return;
             }
     
@@ -73,15 +79,7 @@ const Litigation = () => {
     
             doc.setFontSize(12);
             doc.text('This is a test document for Digital Notices ', 20, 40);
-            // doc.autoTable({
-            //     startY: 50,
-            //     head: [['Field', 'Value']],
-            //     body: [
-            //         ['Date', date],
-            //         ['Address', address]
-            //     ],
-            // });
-            // Table position
+            
             const startX = 20;
             const startY = 50;
             const column1Width = 50;
@@ -129,17 +127,17 @@ const Litigation = () => {
             const { date, address } = extractDateAndAddress();
 
             if (!isNoticeClicked){
-                alert('Please Select Type of Document !')
+                showNotification('Please Select Type of Document !','error')
                 return;
             }
 
             if (!date || !address) {
-                alert('Please include both Date and Address in the AI Text area.');
+                showNotification('Please include both Date and Address in the AI Text area.','error');
                 return;
             }
         
             if (!pdfFile) {
-                alert('Please upload a valid PDF file.');
+                showNotification('Please upload a valid PDF file.','error');
                 return;
             }
 
@@ -170,31 +168,20 @@ const Litigation = () => {
         };
     
 
-//       const genGptResponse = async () => {
-//         setParagraph("...")
-//         await sleep(2000);
-//         var notice = `SUMMON / NOTICE
-// **In The Court of:**
-// SYED ZAHID HUSSAIN TIRMIZI, LEARNED JUDGE FAMILY COURT, ISLAMABAD (EAST)
-// **Case Title:**
-// Ch. Muhammad Faizan
-// **Versus**
-// Mst. Sana Aslam & Another
-// **Summon issued to:**
-// Mst. Sana Aslam, Sector XYZ Islamabad.
-// You are directed to appear before this Court in the above-titled case personally or through attorney, pursue the case against you, and submit your reply for the same on 20th August 2024 at 9:00 am. Otherwise, the case shall proceed ex parte against you.
-// **Note:** This summon relates to the petition filed under Section 25 of the Guardian and Ward Act, 1890 for the custody of minor, which has been consolidated with the suit for dissolution of marriage and related matters filed by you. Your presence is crucial for the just and proper adjudication of these interconnected cases.
-// **Copy is attached.**`;
-
-//         setParagraph(notice)
-//       };
 
       const handleNoticeClick = () => {
         setIsNoticeClicked((prevState) => !prevState);
       };
 
     return (
-        <div className={styles.container}> 
+        <div className={styles.container}>
+            {notification && (
+                <Notification
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
+            )}
             <div className={styles.subContainer}>
                 <div className={styles.buttonsArea}>
                     <div className={styles.centeredContent}>

@@ -1,0 +1,28 @@
+.notification {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f0f4f8;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+    font-size: 14px;
+    transition: all 0.3s ease-in-out;
+    opacity: 1;
+}
+
+.notification.info {
+    border-left: 10px solid #007bff;
+}
+
+.notification.success {
+    border-left: 10px solid #28a745;
+}
+
+.notification.error {
+    border-left: 10px solid #dc3545;
+}

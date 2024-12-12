@@ -133,7 +133,7 @@
     font-family: 'Poppins', sans-serif;
     font-size: large;
     white-space: pre-wrap;
-    border: 1px solid red;
+    border: 1px solid black;
     border-radius: 5px;
     overflow-y: auto;
 }
@@ -193,7 +193,30 @@
 }
 
 .btnTH {
-    width: 10%;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #333333;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btnTH.delete {
+    width: auto;
+}
+
+.btnTH.delete:hover {
+    background-color: #f4dccb;
+}
+
+.btnTH.view {
+    width: auto;
+}
+
+.btnTH.view:hover {
+    background-color: #f4dccb;
 }
 
 .fileTable th {
@@ -207,4 +230,85 @@
 
 .fileUpload {
     display: none;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modalContent h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.modalContent label {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modalContent select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.modalActions button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.modalActions button:first-child {
+    background-color: #274464;
+    color: white;
+}
+
+.modalActions button:first-child:hover {
+    background-color: #1f2f3f;
+}
+
+.modalActions button:last-child {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.modalActions button:last-child:hover {
+    background-color: #e0e0e0;
 }

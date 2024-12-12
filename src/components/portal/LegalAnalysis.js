@@ -1,24 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import styles from './LegalAnalysis.module.css';
+import Notification from './Notification';
 
 const LegalAnalysis = () => {
     const [paragraph, setParagraph] = useState('Analysis will appear here');
     const [fileData, setFileData] = useState([
-        { name: 'Client Testimony', type: 'Audio Transcript' },
-        { name: 'Past Cases', type: 'Document' },
-        { name: 'Court Appeals', type: 'Document' },
-        { name: 'Faizan Shah', type: 'Audio Transcript' },
       ]);
     const [judgementData, setJudgementData] = useState([
-        { name: 'Judgement-30/07/24', date: '30/07/24' },
-        { name: 'Judgement-28/07/24', date: '28/07/24' },
-        { name: 'Judgement-17/07/24', date: '17/07/24' },
-        { name: 'Judgement-16/07/24', date: '16/07/24' },
       ]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [cases, setCases] = useState([]);
+    const [selectedCase, setSelectedCase] = useState(null);
+    const [relevantFiles, setRelevantFiles] = useState([]);
+    const [notification, setNotification] = useState(null);
+    
+    const showNotification = (message, type = 'info') => {
+        setNotification({ message, type });
+    };
 
-      const sleep = (ms) => {
+    const sleep = (ms) => {
         return new Promise(resolve => setTimeout(resolve, ms));
+    };
+
+    
+    useEffect(() => {
+        // Fetch cases from the backend
+        fetch('http://localhost:5000/cases')
+            .then((response) => response.json())
+            .then((data) => setCases(data))
+            .catch((error) => console.error('Error fetching cases:', error));
+
+        // Load selected case and relevant files from localStorage
+        const savedCase = localStorage.getItem('selectedCase');
+        if (savedCase) {
+            const parsedCase = JSON.parse(savedCase);
+            setSelectedCase(parsedCase);
+            fetchRelevantFiles(parsedCase.id);
+        }
+    }, []);
+
+    // Fetch files for the selected case
+    const fetchRelevantFiles = (caseId) => {
+        fetch(`http://localhost:5000/cases/${caseId}/files`)
+            .then((response) => response.json())
+            .then((data) => setRelevantFiles(data))
+            .catch((error) => console.error('Error fetching files:', error));
+    };
+    
+    const handleCaseSelect = () => {
+        if (selectedCase) {
+            localStorage.setItem('selectedCase', JSON.stringify(selectedCase));
+            fetchRelevantFiles(selectedCase.id);
+            setIsModalOpen(false);
+        }
     };
 
     const handleCaseFileUpload = (event) => {
@@ -29,6 +64,28 @@ const LegalAnalysis = () => {
           alert('Please upload a valid PDF file.');
         }
       };
+    
+    const handleDeleteFile = (fileId) => {
+        if (!fileId) {
+            console.error('File ID is undefined');
+            return;
+        }
+    
+        fetch(`http://localhost:5000/files/${fileId}`, {
+            method: 'DELETE',
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete file');
+                }
+                setRelevantFiles((prevFiles) =>
+                    prevFiles.filter((file) => file.id !== fileId)
+                );
+                showNotification('File deleted successfully!','success');
+            })
+            .catch((error) => console.error('Error deleting file:', error));
+    };
+    
 
     const handleGenJudgement = async () => {
         await sleep(2000);
@@ -328,12 +385,23 @@ SCJ-III/Judge Family-Guardian Court, East Islamabad.
     
 
     return (
-        <div className={styles.container}> 
+        <div className={styles.container}>
+            {notification && (
+                <Notification
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
+            )}
             <div className={styles.subContainer}>
                 <div className={styles.caseHeader}>
-                    <p className={styles.caseHeaderText}>Case Name: Ch. Muhammad Faizan Vs Mst. Sana Aslam, Chaudhary Muhammad Akbar</p>
-                    <button className={styles.caseHeaderButton}>Case Timeline</button>
-                    <button>Change Case</button>
+                <p className={styles.caseHeaderText}>Case Name: {selectedCase ? selectedCase.case_name : ''}</p>
+                    <button
+                        className={styles.caseHeaderButton}
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        Select Case
+                    </button>
                 </div>
                 <div className={styles.areaDivider}>
                     <div className={styles.leftArea}>
@@ -358,12 +426,28 @@ SCJ-III/Judge Family-Guardian Court, East Islamabad.
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {fileData.map((file, index) => (
+                                    {relevantFiles.map((file, index) => (
                                         <tr key={index}>
-                                        <td className={styles.fileNameTD}>{file.name}</td>
-                                        <td className={styles.fileTypeTD}>{file.type}</td>
-                                        <td><button className={styles.btnTH}>Delete</button></td>
-                                        <td><button className={styles.btnTH}>View</button></td>
+                                            <td className={styles.fileNameTD}>{file.file_name}</td>
+                                            <td className={styles.fileTypeTD}>{file.file_type}</td>
+                                            <td>
+                                                <button
+                                                    className={`${styles.btnTH} ${styles.delete}`}
+                                                    onClick={() => handleDeleteFile(file.id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className={`${styles.btnTH} ${styles.view}`}
+                                                    onClick={() =>
+                                                        window.open(`http://localhost:5000/files/${file.file_name}`, '_blank')
+                                                    }
+                                                >
+                                                    View
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -419,6 +503,37 @@ SCJ-III/Judge Family-Guardian Court, East Islamabad.
                     </div>
                 </div>
             </div>
+            {isModalOpen && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <h3>Select a Case</h3>
+                        <label>
+                            Cases:
+                            <select
+                                onChange={(e) => {
+                                    const selectedId = e.target.value;
+                                    const selected = cases.find((c) => c.id === parseInt(selectedId, 10));
+                                    setSelectedCase(selected);
+                                }}
+                                defaultValue=""
+                            >
+                                <option value="" disabled>
+                                    Select a case
+                                </option>
+                                {cases.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                        {c.case_name}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <div className={styles.modalActions}>
+                            <button onClick={handleCaseSelect}>Select</button>
+                            <button onClick={() => setIsModalOpen(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

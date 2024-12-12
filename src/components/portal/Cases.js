@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Cases.module.css';
+import Notification from './Notification';
 
 const Cases = () => {
-    const [cases, setCases] = useState(() => {
-        // Load from localStorage on initial render
-        const storedCases = localStorage.getItem('cases');
-        return storedCases ? JSON.parse(storedCases) : [];
-    });
+    const [cases, setCases] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isFileModalOpen, setIsFileModalOpen] = useState(false);
+    const [currentCaseId, setCurrentCaseId] = useState(null);
+    const [notification, setNotification] = useState(null);
     const [newCase, setNewCase] = useState({
         caseNumber: '',
         caseName: '',
@@ -15,6 +15,31 @@ const Cases = () => {
         daysOpen: '',
         status: 'Pre-litigation',
     });
+    const [uploadedFiles, setUploadedFiles] = useState({
+        legalDocuments: [],
+        evidence: [],
+    });
+
+    const showNotification = (message, type = 'info') => {
+        setNotification({ message, type });
+    };
+
+    // Fetch cases from the backend
+    useEffect(() => {
+        fetch('http://localhost:5000/cases')
+            .then((response) => response.json())
+            .then((data) => setCases(data))
+            .catch((error) => console.error('Error fetching cases:', error));
+    }, []);
+
+
+    // Fetch cases from the backend
+    useEffect(() => {
+        fetch('http://localhost:5000/cases')
+            .then((response) => response.json())
+            .then((data) => setCases(data))
+            .catch((error) => console.error('Error fetching cases:', error));
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -23,25 +48,73 @@ const Cases = () => {
 
     const handleSaveCase = () => {
         if (!newCase.caseNumber || !newCase.caseName || !newCase.type || !newCase.daysOpen) {
-            alert('Please fill in all fields before saving.');
+            showNotification('Please fill in all fields before saving!','error');
             return;
         }
 
-        const updatedCases = [...cases, newCase];
-        setCases(updatedCases); // Add the new case to the list
-        localStorage.setItem('cases', JSON.stringify(updatedCases)); // Save to localStorage
-        setNewCase({ caseNumber: '', caseName: '', type: '', daysOpen: '', status: 'Pre-litigation' }); // Reset the form
-        setIsModalOpen(false); // Close the modal
+        fetch('http://localhost:5000/cases', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newCase),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setCases([...cases, data]); // Update state with new case
+                setNewCase({ caseNumber: '', caseName: '', type: '', daysOpen: '', status: 'Pre-litigation' }); // Reset form
+                setIsModalOpen(false); // Close modal
+            })
+            .catch((error) => console.error('Error saving case:', error));
     };
 
-    const handleDeleteCase = (index) => {
-        const updatedCases = cases.filter((_, i) => i !== index); // Handle deletion of cases
-        setCases(updatedCases); // Update state
-        localStorage.setItem('cases', JSON.stringify(updatedCases)); // Save updated cases to localStorage
+    const handleDeleteCase = (id) => {
+        fetch(`http://localhost:5000/cases/${id}`, { method: 'DELETE' })
+            .then(() => {
+                setCases(cases.filter((c) => c.id !== id)); // Remove from state
+            })
+            .catch((error) => console.error('Error deleting case:', error));
+    };
+
+    const handleFileChange = (e, type) => {
+        setUploadedFiles((prevState) => ({
+            ...prevState,
+            [type]: [...prevState[type], ...e.target.files],
+        }));
+    };
+
+    const handleAttachFiles = (caseId) => {
+        setCurrentCaseId(caseId);
+        setIsFileModalOpen(true);
+    };
+
+    const handleSaveFiles = () => {
+        if (!currentCaseId) return;
+
+        const formData = new FormData();
+        uploadedFiles.legalDocuments.forEach((file) => formData.append('legalDocuments', file));
+        uploadedFiles.evidence.forEach((file) => formData.append('evidence', file));
+
+        fetch(`http://localhost:5000/cases/${currentCaseId}/upload-files`, {
+            method: 'POST',
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then(() => {
+                showNotification('Files uploaded successfully!','error');
+                setIsFileModalOpen(false);
+                setUploadedFiles({ legalDocuments: [], evidence: [] });
+            })
+            .catch((error) => console.error('Error uploading files:', error));
     };
 
     return (
         <div className={styles.container}>
+            {notification && (
+                <Notification
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
+            )}
             <div className={styles.header}>
                 <h4>Case Listing</h4>
                 <button className={styles.newCaseButton} onClick={() => setIsModalOpen(true)}>New Case</button>
@@ -54,21 +127,30 @@ const Cases = () => {
                         <th>TYPE</th>
                         <th>DAYS OPEN</th>
                         <th>STATUS</th>
-                        <th>ACTION</th> {/* Added Action Column */}
+                        <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {cases.map((c, index) => (
-                        <tr key={index}>
-                            <td>{c.caseNumber}</td>
-                            <td>{c.caseName}</td>
+                    {cases.map((c) => (
+                        <tr key={c.id}>
+                            <td>{c.case_number}</td>
+                            <td>{c.case_name}</td>
                             <td>{c.type}</td>
-                            <td>{c.daysOpen}</td>
+                            <td>{c.days_open}</td>
                             <td>{c.status}</td>
                             <td>
                                 <button
+                                    className={styles.attachButton}
+                                    onClick={() => handleAttachFiles(c.id)}
+                                >
+                                    Attach Files
+                                </button>
+                            </td>
+                            <td>
+                                <button
                                     className={styles.deleteButton}
-                                    onClick={() => handleDeleteCase(index)}
+                                    onClick={() => handleDeleteCase(c.id)}
                                 >
                                     Delete
                                 </button>
@@ -133,6 +215,54 @@ const Cases = () => {
                         <div className={styles.modalActions}>
                             <button onClick={handleSaveCase}>Save</button>
                             <button onClick={() => setIsModalOpen(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isFileModalOpen && (
+                <div className={styles.filemodal}>
+                    <div className={styles.filemodalContent}>
+                        <h3>Attach Files</h3>
+                        <div className={styles.fileUploadSection}>
+                            <div>
+                                <h4>Legal Documents</h4>
+                                <input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => handleFileChange(e, 'legalDocuments')}
+                                />
+                                <p>{uploadedFiles.legalDocuments.length} file(s) attached</p>
+                                <ul className={styles.fileList}>
+                                    {uploadedFiles.legalDocuments.map((file, index) => (
+                                        <li key={index}>{file.name}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div>
+                                <h4>Evidence</h4>
+                                <input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) => handleFileChange(e, 'evidence')}
+                                />
+                                <p>{uploadedFiles.evidence.length} file(s) attached</p>
+                                <ul className={styles.fileList}>
+                                    {uploadedFiles.evidence.map((file, index) => (
+                                        <li key={index}>{file.name}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                        <div className={styles.filemodalActions}>
+                            <button onClick={handleSaveFiles}>Save</button>
+                            <button 
+                                onClick={() => {
+                                    setUploadedFiles({ legalDocuments: [], evidence: [] });
+                                    setIsFileModalOpen(false);
+                                }}
+                            >
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </div>
