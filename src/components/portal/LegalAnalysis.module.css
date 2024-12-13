@@ -51,6 +51,11 @@
 
 .caseHeaderButton {
     margin-left: auto;
+    cursor: pointer;
+}
+
+.caseHeaderButton:hover {
+    background-color: #1b3452;
 }
 
 .areaDivider {
@@ -110,6 +115,10 @@
     margin-left: 10px;
 }
 
+.caseName {
+    margin-left: 10px;
+}
+
 .promptText {
     width: 99%;
     height: 39%;
@@ -124,6 +133,11 @@
 
 .askQaziBtn {
     margin-left: auto;
+    cursor: pointer;
+}
+
+.askQaziBtn:hover {
+    background-color: #1b3452;
 }
 
 .aiText {
@@ -191,6 +205,18 @@
     font-size: medium;
     font-weight: 400;
 }
+
+
+.fileNameText {
+    max-width: 230px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 18px;
+    color: #333;
+    font-weight: 500;
+}
+
 
 .btnTH {
     padding: 8px 16px;

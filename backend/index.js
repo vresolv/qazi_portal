@@ -110,6 +110,15 @@ app.post(
         const { id } = req.params;
 
         try {
+            // Fetch the case_name from the cases table using the case_id
+            const caseResult = await pool.query('SELECT case_name FROM cases WHERE id = $1', [id]);
+
+            if (caseResult.rows.length === 0) {
+                return res.status(404).json({ message: 'Case not found' });
+            }
+
+            const caseName = caseResult.rows[0].case_name;
+
             const files = [];
             ['legalDocuments', 'evidence'].forEach((type) => {
                 if (req.files[type]) {
@@ -119,6 +128,7 @@ app.post(
                             file_type: type,
                             file_name: file.originalname,
                             file_path: file.path,
+                            case_name: caseName, // Add the case_name here
                         });
                     });
                 }
@@ -127,8 +137,8 @@ app.post(
             // Insert file details into the database
             const insertPromises = files.map((file) =>
                 pool.query(
-                    'INSERT INTO uploaded_files (case_id, file_type, file_name, file_path) VALUES ($1, $2, $3, $4)',
-                    [file.case_id, file.file_type, file.file_name, file.file_path]
+                    'INSERT INTO uploaded_files (case_id, file_type, file_name, file_path, case_name) VALUES ($1, $2, $3, $4, $5)',
+                    [file.case_id, file.file_type, file.file_name, file.file_path, file.case_name]
                 )
             );
             await Promise.all(insertPromises);
@@ -147,7 +157,7 @@ app.get('/cases/:id/files', async (req, res) => {
 
     try {
         const result = await pool.query(
-            'SELECT id, file_type, file_name, file_path FROM uploaded_files WHERE case_id = $1',
+            'SELECT id, file_type, file_name, file_path, case_name FROM uploaded_files WHERE case_id = $1',
             [id]
         );
         res.json(result.rows);
@@ -220,6 +230,7 @@ app.delete('/files/:id', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
 
 
 const PORT = 5000;

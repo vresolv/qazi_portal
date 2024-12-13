@@ -39,6 +39,11 @@
     padding-right: 20px;
 }
 
+.container button:hover {
+    background-color: #1b3452;
+    cursor: pointer;
+}
+
 .container select {
     font-family: 'Poppins', sans-serif;
     font-size: large;
@@ -82,6 +87,11 @@
     height: 90%;
     padding-left: 20px;
     padding-right: 20px;
+    cursor: pointer;
+}
+
+.noticeBtn:hover {
+    background-color: #1b3452;
 }
 
 .green {

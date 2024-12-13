@@ -79,7 +79,7 @@ const Litigation = () => {
     
             doc.setFontSize(12);
             doc.text('This is a test document for Digital Notices ', 20, 40);
-            
+
             const startX = 20;
             const startY = 50;
             const column1Width = 50;
@@ -148,12 +148,12 @@ const Litigation = () => {
                 const formData = new FormData();
                 formData.append('date', date);
                 formData.append('address', address);
-                formData.append('file', pdfFile); // Add the uploaded file
+                formData.append('file', pdfFile);
                 formData.append('documentType', documentType)
         
                 const response = await fetch('https://api.example.com/generate', {
                     method: 'POST',
-                    body: formData, // Send FormData instead of JSON
+                    body: formData,
                 });
         
                 if (!response.ok) {
@@ -161,7 +161,7 @@ const Litigation = () => {
                 }
         
                 const data = await response.json();
-                setGeneratedResults(data.result || 'No results found.');
+                setGeneratedResults(data.response || 'No results found.');
             } catch (error) {
                 setGeneratedResults(`Failed to Fetch From API !!!!\nDate: ${date}\nAddress: ${address}\nDocument Type: ${documentType}`);
             }

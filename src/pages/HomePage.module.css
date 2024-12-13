@@ -28,12 +28,14 @@
     width: 70%;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    flex-direction: row;
+    justify-content: flex-start;
+    gap: 20px;
+    padding-left: 17%; 
     font-weight: bold;
     font-size: 20px;
     color: #274464;
 }
+
 
 .dividerCircle {
     width: 10px;
@@ -51,4 +53,6 @@
     font-size: x-large;
     background-color: #c5a683;
     color: white;
+    margin-left: auto;
+    margin-right: 34%;
 }
