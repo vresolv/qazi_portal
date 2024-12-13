@@ -3,6 +3,7 @@ import styles from './Portal.module.css';
 import NavBar from '../components/portal/Nav';
 import Litigation from '../components/portal/Litigation';
 import LegalAnalysis from '../components/portal/LegalAnalysis';
+import PrecedenceAnalysis from '../components/portal/Precedence';
 import Cases from '../components/portal/Cases';
 import dashboardIcon from '../assets/Portal/dashboard.png';
 import litigationIcon from '../assets/Portal/litigation.png';
@@ -37,16 +38,21 @@ const Portal = () => {
                     </div>
                     <div className={selectedButton === 4 ? styles.menuButtonAreaSelected : styles.menuButtonArea} onClick={() => handleMenuChange(4)}>
                         <img className={styles.buttonIcon} src={casesIcon} alt="Logo" />
+                        <p className={styles.menuButton}>Precedence Analysis</p>
+                    </div>
+                    <div className={selectedButton === 5 ? styles.menuButtonAreaSelected : styles.menuButtonArea} onClick={() => handleMenuChange(5)}>
+                        <img className={styles.buttonIcon} src={casesIcon} alt="Logo" />
                         <p className={styles.menuButton}>Cases</p>
                     </div>
-                    <div className={selectedButton === 5 ? styles.menuButtonAreaSelected : styles.menuButtonArea}>
+                    <div className={selectedButton === 6 ? styles.menuButtonAreaSelected : styles.menuButtonArea}>
                         <img className={styles.buttonIcon} src={settingsIcon} alt="Logo" />
                         <p className={styles.menuButton}>Settings</p>
                     </div>
                 </div>
             {selectedButton === 2 && <Litigation />}
             {selectedButton === 3 && <LegalAnalysis />}
-            {selectedButton === 4 && <Cases />}
+            {selectedButton === 4 && <PrecedenceAnalysis />}
+            {selectedButton === 5 && <Cases />}
             </div>
         </div>
     );

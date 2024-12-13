@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import styles from './Litigation.module.css';
@@ -12,12 +12,35 @@ const Litigation = () => {
     const [isNoticeClicked, setIsNoticeClicked] = useState(false);
     const [aiText, setAiText] = useState('');
     const [generatedResults, setGeneratedResults] = useState('');
+    const [loading, setLoading] = useState(false);
     const [notification, setNotification] = useState(null);
     
     const showNotification = (message, type = 'info') => {
         setNotification({ message, type });
     };
     
+    // Load state from sessionStorage
+    useEffect(() => {
+        const savedaiText = sessionStorage.getItem('aiText');
+        const savedgeneratedText = sessionStorage.getItem('generatedResults');
+        const savedDocType = sessionStorage.getItem('isNoticeClicked');
+
+        if (savedaiText) setAiText(savedaiText);
+        if (savedgeneratedText) setGeneratedResults(savedgeneratedText);
+        if (savedDocType) setIsNoticeClicked(savedDocType);
+    }, []);
+
+    useEffect(() => {
+        const saveToSessionStorage = () => {
+            sessionStorage.setItem('aiText', aiText);
+            sessionStorage.setItem('generatedResults', generatedResults);
+            sessionStorage.setItem('isNoticeClicked', isNoticeClicked);
+        };
+    
+        saveToSessionStorage();
+    }, [aiText, generatedResults,isNoticeClicked]);
+
+
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file && file.type === 'application/pdf') {
@@ -28,150 +51,93 @@ const Litigation = () => {
           setPdfFile(null);
           setFileName(null);
         }
-      };
+    };
       
 
-      const triggerFileInput = () => {
+    const triggerFileInput = () => {
         document.getElementById('file-upload').click();
-      };
+    };
 
-
-      const extractDateAndAddress = () => {
-            const lines = aiText.trim().split('\n').filter(line => line.trim() !== '');
-            let date = '';
-            let address = '';
+    const handleDownloadDocument = () => {
+        if (!generatedResults.trim()) {
+            showNotification('No content available in the Generated Results area.', 'error');
+            return;
+        }
         
-            for (const line of lines) {
-                if (/^\d{2}-\d{2}-\d{4}$/.test(line.trim())) {
-                    date = line.trim();
-                } else {
-                    address = line.trim();
-                }
-            }
+        const doc = new jsPDF();
+    
+        const heading = 'Summon Notice';
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.text(heading, 105, 20, { align: 'center' });
+        const headingWidth = doc.getTextWidth(heading);
+        doc.line(105 - headingWidth / 2, 22, 105 + headingWidth / 2, 22);
         
-            console.log('Extracted Date:', date);
-            console.log('Extracted Address:', address);
+        // paragraph
+        const paragraph = generatedResults.replace(/\n/g, ' ');
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(13);
         
-            return { date, address };
-        };
-    
-    
-        const handleDownloadDocument = () => {
-            if (!generatedResults) {
-                showNotification('No content available in the Generated Results area.','error');
-                return;
-            }
-    
-            // first line as the heading and remaining lines as data
-            const lines = generatedResults.split('\n').filter(line => line.trim() !== '');
-            const heading = lines[0];
-            const date = lines[1]?.replace(/^Date:\s*/, '') || 'Date not available';
-            const address = lines[2]?.replace(/^Address:\s*/, '') || 'Address not available';
-            const documentType = lines[3]?.replace(/^Document Type:\s*/, '') || 'Type of Document not defined';
-
-            const doc = new jsPDF();
-    
-            // Heading
-            doc.setFontSize(16);
-            doc.text(heading, 105, 20, { align: 'center' });
-            const headingWidth = doc.getTextWidth(heading);
-            doc.line(105 - headingWidth / 2, 22, 105 - headingWidth / 2 + headingWidth, 22);
-    
-            doc.setFontSize(12);
-            doc.text('This is a test document for Digital Notices ', 20, 40);
-
-            const startX = 20;
-            const startY = 50;
-            const column1Width = 50;
-            const column2Width = 120;
-            const rowHeight = 10;
-
-            // First row for Date
-            doc.rect(startX, startY, column1Width, rowHeight);
-            doc.text('Date:', startX + 5, startY + 7);
-            doc.rect(startX + column1Width, startY, column2Width, rowHeight);
-            doc.text(date, startX + column1Width + 5, startY + 7);
-
-            // Second row for Address
-            doc.rect(startX, startY + rowHeight, column1Width, rowHeight);
-            doc.text('Address:', startX + 5, startY + rowHeight + 7);
-            doc.rect(startX + column1Width, startY + rowHeight, column2Width, rowHeight);
-            doc.text(address, startX + column1Width + 5, startY + rowHeight + 7);
-
-             // Third row for Document Type
-            doc.rect(startX, startY + rowHeight * 2, column1Width, rowHeight);
-            doc.text('Document Type:', startX + 5, startY + rowHeight * 2 + 7);
-            doc.rect(startX + column1Width, startY + rowHeight * 2, column2Width, rowHeight);
-            doc.text(documentType, startX + column1Width + 5, startY + rowHeight * 2 + 7);
-
-            // "Terms and Conditions"
-            const termsStartY = startY + rowHeight * 2 + 20;
-            doc.setFontSize(14);
-            doc.setFont('Helvetica', 'bold');
-            doc.text('Terms and Conditions', startX, termsStartY);
-
-            doc.setFontSize(12);
-            doc.setFont('Helvetica', 'normal');
-            const termsText = [
-                '1. This is Term 1.',
-                '2. This is Term 2.',
-            ];
-            termsText.forEach((term, index) => {
-                doc.text(term, startX, termsStartY + (index + 1) * 10);
-            });
-
-            doc.save('GeneratedDocument.pdf');
-        };
-
-        const genGptResponse = async () => {
-            const { date, address } = extractDateAndAddress();
-
-            if (!isNoticeClicked){
-                showNotification('Please Select Type of Document !','error')
-                return;
-            }
-
-            if (!date || !address) {
-                showNotification('Please include both Date and Address in the AI Text area.','error');
-                return;
-            }
+        const marginX = 20;
+        const marginY = 40;
+        const pageWidth = doc.internal.pageSize.getWidth() - marginX * 2;
+        const textLines = doc.splitTextToSize(paragraph, pageWidth);
         
-            if (!pdfFile) {
-                showNotification('Please upload a valid PDF file.','error');
-                return;
-            }
+        doc.text(textLines, marginX, marginY);
+        
+        doc.save('SummonNotice.pdf');
+    };
+        
 
-            const documentType = isNoticeClicked ? 'Notice' : 'Other';
+    const genGptResponse = async () => {
+        if (!isNoticeClicked){
+            showNotification('Please Select Type of Document !','error')
+            return;
+         }
+
+        if (!aiText) {
+            showNotification('Please include both Date and Address in the AI Text area.','error');
+            return;
+        }
+        
+        if (!pdfFile) {
+            showNotification('Please upload a valid PDF file.','error');
+            return;
+        }
+
+        const documentType = isNoticeClicked ? 'Notice' : 'Other';
+        setLoading(true);
+        setGeneratedResults('Generating...');
             
-            try {
+        try {
                 
-                const formData = new FormData();
-                formData.append('date', date);
-                formData.append('address', address);
-                formData.append('file', pdfFile);
-                formData.append('documentType', documentType)
+            const formData = new FormData();
+            formData.append('details', aiText);
+            formData.append('case_file', pdfFile);
+               
         
-                const response = await fetch('https://api.example.com/generate', {
-                    method: 'POST',
-                    body: formData,
-                });
+            const response = await fetch('http://127.0.0.1:8000/legal-doc-generation/', {
+                method: 'POST',
+                body: formData,
+            });
         
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data from the API');
-                }
-        
-                const data = await response.json();
-                setGeneratedResults(data.response || 'No results found.');
-            } catch (error) {
-                setGeneratedResults(`Failed to Fetch From API !!!!\nDate: ${date}\nAddress: ${address}\nDocument Type: ${documentType}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data from the API');
             }
-        };
+        
+            const data = await response.json();
+            setGeneratedResults(data.response || 'No results found.');
+        } catch (error) {
+            setGeneratedResults(`Failed to Fetch Results !`);
+        } finally {
+            setLoading(false);
+        }
+    };
     
 
-
-      const handleNoticeClick = () => {
+    const handleNoticeClick = () => {
         setIsNoticeClicked((prevState) => !prevState);
-      };
+    };
 
     return (
         <div className={styles.container}>

@@ -1,25 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
-import styles from './LegalAnalysis.module.css';
+import styles from './Precedence.module.css';
 import Notification from './Notification';
 
-const LegalAnalysis = () => {
+const PrecedenceAnalysis = () => {
     const [paragraph, setParagraph] = useState('Analysis will appear here');
-    const [judgementData, setJudgementData] = useState([
-      ]);
-    const [legalQuery, setLegalQuery] = useState('');
-    const [analysisResult, setAnalysisResult] = useState('');
+    const [precedenceQuery, setLegalQuery] = useState('');
+    const [precedenceAnalysis, setAnalysisResult] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [cases, setCases] = useState([]);
-    const [selectedCase, setSelectedCase] = useState(null);
-    const [relevantFiles, setRelevantFiles] = useState([]);
-    const [pdfFile, setPdfFile] = useState(null);
-    const [fileName, setFileName] = useState('');
+    const [iscase, setCases] = useState([]);
+    const [selectedCases, setSelectedCase] = useState(null);
+    const [caseRelevantFiles, setRelevantFiles] = useState([]);
+    const [pdfFileset, setPdfFile] = useState(null);
+    const [isfileNameSet, setFileName] = useState('');
     const [loading, setLoading] = useState(false);
-    const [selectedFileId, setSelectedFileId] = useState(null);
-    const [isFileModalOpen, setIsFileModalOpen] = useState(false);
-    const [uploadedFiles, setUploadedFiles] = useState({ legalDocuments: [], evidence: [] });
-    const [currentCaseId, setCurrentCaseId] = useState(null);
     const [notification, setNotification] = useState(null);
     
     const showNotification = (message, type = 'info') => {
@@ -39,7 +33,7 @@ const LegalAnalysis = () => {
             .catch((error) => console.error('Error fetching cases:', error));
 
         // Load selected case and relevant files from localStorage
-        const savedCase = localStorage.getItem('selectedCase');
+        const savedCase = localStorage.getItem('selectedCases');
         if (savedCase) {
             const parsedCase = JSON.parse(savedCase);
             setSelectedCase(parsedCase);
@@ -47,23 +41,32 @@ const LegalAnalysis = () => {
         }
     }, []);
 
-    // Load state from sessionStorage
-    useEffect(() => {
-        const savedQuery = sessionStorage.getItem('legalQuery');
-        const savedAnalysis = sessionStorage.getItem('analysisResult');
+    // // Load state from sessionStorage
+    // useEffect(() => {
+    //     const savedQuery = sessionStorage.getItem('precedenceQuery');
+    //     const savedAnalysis = sessionStorage.getItem('precedenceAnalysis');
+    //     const savedFileName = sessionStorage.getItem('isfileNameSet');
 
-        if (savedQuery) setLegalQuery(savedQuery);
-        if (savedAnalysis) setAnalysisResult(savedAnalysis);
-    }, []);
+    //     if (savedQuery) setLegalQuery(savedQuery);
+    //     if (savedAnalysis) setAnalysisResult(savedAnalysis);
+    //     if (savedFileName) setFileName(savedFileName);
+    // }, []);
 
-    useEffect(() => {
-        const saveToSessionStorage = () => {
-            sessionStorage.setItem('legalQuery', legalQuery);
-            sessionStorage.setItem('analysisResult', analysisResult);
-        };
+    // useEffect(() => {
+    //     const saveToSessionStorage = () => {
+    //         sessionStorage.setItem('precedenceQuery', precedenceQuery);
+    //         sessionStorage.setItem('precedenceAnalysis', precedenceAnalysis);
+    //         if (fileName) {
+    //             sessionStorage.setItem('fileName', fileName);
+    //         } else {
+    //             sessionStorage.removeItem('fileName');
+    //         }
+    //     };
     
-        saveToSessionStorage();
-    }, [legalQuery, analysisResult]);
+    //     saveToSessionStorage();
+    // }, [precedenceQuery, precedenceAnalysis, fileName]);
+
+
 
     // Fetch attched files for case
     const fetchRelevantFiles = (caseId) => {
@@ -74,54 +77,12 @@ const LegalAnalysis = () => {
     };
     
     const handleCaseSelect = () => {
-        if (selectedCase) {
-            localStorage.setItem('selectedCase', JSON.stringify(selectedCase));
-            fetchRelevantFiles(selectedCase.id);
+        if (selectedCases) {
+            localStorage.setItem('selectedCases', JSON.stringify(selectedCases));
+            fetchRelevantFiles(selectedCases.id);
             setIsModalOpen(false);
         }
     };
-
-    
-    const handleSelectFile = (fileId) => {
-        if (!fileId) {
-            console.error('File ID is undefined');
-            return;
-        }
-    
-        // If the file is already selected, unselect it
-        if (selectedFileId === fileId) {
-            setSelectedFileId(null);
-            setPdfFile(null);
-            setFileName('');
-            showNotification('File unselected successfully.', 'info');
-            return;
-        }
-    
-        // Select the file
-        const selectedFile = relevantFiles.find((file) => file.id === fileId);
-        if (!selectedFile) {
-            console.error('File not found in the list.');
-            return;
-        }
-    
-        fetch(`http://localhost:5000/files/${selectedFile.file_name}`)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Failed to fetch the selected file');
-                }
-                return response.blob();
-            })
-            .then((blob) => {
-                const file = new File([blob], selectedFile.file_name, { type: selectedFile.file_type });
-                setPdfFile(file); // Update the state with the selected file
-                setFileName(file.name); // Update the file name
-                setSelectedFileId(fileId); // Mark the file as selected
-                showNotification(`File "${file.name}" selected successfully.`, 'success');
-            })
-            .catch((error) => console.error('Error selecting file:', error));
-    };
-    
-
 
     const handleDeleteFile = (fileId) => {
         if (!fileId) {
@@ -144,69 +105,26 @@ const LegalAnalysis = () => {
             .catch((error) => console.error('Error deleting file:', error));
     };
     
-    const handleSaveFiles = () => {
-        if (!currentCaseId) {
-            showNotification('No case selected.', 'error');
-            return;
-        }
-    
-        const formData = new FormData();
-        uploadedFiles.legalDocuments.forEach((file) => formData.append('legalDocuments', file));
-        uploadedFiles.evidence.forEach((file) => formData.append('evidence', file));
-    
-        fetch(`http://localhost:5000/cases/${currentCaseId}/upload-files`, {
-            method: 'POST',
-            body: formData,
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Error uploading files');
-                }
-                return response.json();
-            })
-            .then(() => {
-                showNotification('Files uploaded successfully!', 'success');
-                setIsFileModalOpen(false); // Close the modal
-                setUploadedFiles({ legalDocuments: [], evidence: [] }); // Clear files
-    
-                // Refresh the relevant files list
-                fetchRelevantFiles(currentCaseId);
-            })
-            .catch((error) => console.error('Error uploading files:', error));
-    };
-    
-    
-
-    const handleGenJudgement = async () => {
-        await sleep(2000);
-        setJudgementData([{ name: 'Judgement-01/08/24', date: '01/08/24' }, ...judgementData,]);
-    };
-
     const triggerFileInput = () => {
         document.getElementById('file-upload').click();
     };
 
-    // const handleFileChange = (event) => {
-    //     const file = event.target.files[0];
-    //     if (file && file.type === 'application/pdf') {
-    //       setPdfFile(file);
-    //       setFileName(file.name);
-    //     } else {
-    //       showNotification('Please upload a valid PDF file.','error');
-    //       setPdfFile(null);
-    //       setFileName(null);
-    //     }
-    // };
-    const handleFileChange = (e, type) => {
-        setUploadedFiles((prevState) => ({
-            ...prevState,
-            [type]: [...prevState[type], ...e.target.files],
-        }));
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file && file.type === 'application/pdf') {
+          setPdfFile(file);
+          setFileName(file.name);
+        } else {
+          showNotification('Please upload a valid PDF file.','error');
+          setPdfFile(null);
+          setFileName(null);
+        }
     };
-    
 
-    const genGptAnalysisResponse = async () => {
-        if (!legalQuery.trim()) {
+
+
+    const genPrecendenceAnalysisResponse = async () => {
+        if (!precedenceQuery.trim()) {
             showNotification('Please enter a query', 'error');
             return;
         }
@@ -216,11 +134,11 @@ const LegalAnalysis = () => {
     
         try {
             const formData = new FormData();
-            formData.append('query', legalQuery);
+            formData.append('query', precedenceQuery);
     
             // Only append the file if it's present
-            if (pdfFile) {
-                formData.append('case_file', pdfFile);
+            if (pdfFileset) {
+                formData.append('case_file', pdfFileset);
             }
     
             const response = await fetch('http://127.0.0.1:8000/legal-analysis/', {
@@ -244,8 +162,6 @@ const LegalAnalysis = () => {
         }
     };
     
-    
-    
 
     return (
         <div className={styles.container}>
@@ -259,7 +175,7 @@ const LegalAnalysis = () => {
             <div className={styles.subContainer}>
                 <div className={styles.caseHeader}>
                     <p className={styles.caseHeaderText}>
-                        Case Name: <span className={styles.caseName}>{relevantFiles.length > 0 ? relevantFiles[0].case_name : 'No Case Selected'}</span>
+                        Case Name: <span className={styles.caseName}>{caseRelevantFiles.length > 0 ? caseRelevantFiles[0].case_name : 'No Case Selected'}</span>
                     </p>
                     <button
                         className={styles.caseHeaderButton}
@@ -284,21 +200,10 @@ const LegalAnalysis = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {relevantFiles.map((file, index) => (
-                                        <tr key={index}
-                                            style={{
-                                                backgroundColor: selectedFileId === file.id ? 'lightgreen' : 'transparent',
-                                            }}>
+                                    {caseRelevantFiles.map((file, index) => (
+                                        <tr key={index}>
                                             <td className={styles.fileNameTD}>{file.file_name}</td>
                                             <td className={styles.fileTypeTD}>{file.file_type}</td>
-                                            <td>
-                                                <button
-                                                    className={`${styles.btnTH} ${styles.delete}`}
-                                                    onClick={() => handleSelectFile(file.id)}
-                                                >
-                                                    {selectedFileId === file.id ? 'Unselect' : 'Select'}
-                                                </button>
-                                            </td>
                                             <td>
                                                 <button
                                                     className={`${styles.btnTH} ${styles.delete}`}
@@ -322,7 +227,7 @@ const LegalAnalysis = () => {
                                 </tbody>
                             </table>
                         </div>
-                        <div className={styles.caseArea}>
+                        {/* <div className={styles.caseArea}>
                             <p className={styles.caseHeaderText}>Judgements</p>
                             <button onClick={handleGenJudgement}>Generate Judgement</button>
                         </div>
@@ -347,7 +252,7 @@ const LegalAnalysis = () => {
                                         ))}
                                     </tbody>
                                 </table>
-                        </div>
+                        </div> */}
                     </div>
                     <div className={styles.rightArea}>
                         <div className={styles.caseArea}>
@@ -356,33 +261,26 @@ const LegalAnalysis = () => {
                         <textarea
                             className={styles.promptText}
                             placeholder="Ask for any Legal Analysis help here"
-                            value={legalQuery}
+                            value={precedenceQuery}
                             onChange={(e) => setLegalQuery(e.target.value)}
                         ></textarea>
                         <div className={styles.caseArea}>
-                            <button
-                                onClick={() => {
-                                    setCurrentCaseId(selectedCase?.id);
-                                    setIsFileModalOpen(true);
-                                }}
-                            >
-                                Upload File
-                            </button>
-                            <p className={styles.fileNameText}>{fileName}</p>
+                            <button onClick={triggerFileInput}>Upload File</button>
+                            <p className={styles.fileNameText}>{isfileNameSet}</p>
                                 <input 
                                     type="file"
                                     accept="application/pdf"  
                                     className={styles.fileUpload}
                                     onChange={handleFileChange}
                                     id="file-upload"/>
-                            <button className={styles.askQaziBtn} onClick={genGptAnalysisResponse}>
+                            <button className={styles.askQaziBtn} onClick={genPrecendenceAnalysisResponse}>
                                 Ask Qazi
                             </button>
                         </div>
                         <div className={styles.caseGenTextArea}>
                             <p className={styles.caseGenText}>Generation Results</p>
                         </div>
-                        <div className={styles.aiText}>{analysisResult}</div>
+                        <div className={styles.aiText}>{precedenceAnalysis}</div>
                     </div>
                 </div>
             </div>
@@ -395,7 +293,7 @@ const LegalAnalysis = () => {
                             <select
                                 onChange={(e) => {
                                     const selectedId = e.target.value;
-                                    const selected = cases.find((c) => c.id === parseInt(selectedId, 10));
+                                    const selected = iscase.find((c) => c.id === parseInt(selectedId, 10));
                                     setSelectedCase(selected);
                                 }}
                                 defaultValue=""
@@ -403,7 +301,7 @@ const LegalAnalysis = () => {
                                 <option value="" disabled>
                                     Select a case
                                 </option>
-                                {cases.map((c) => (
+                                {iscase.map((c) => (
                                     <option key={c.id} value={c.id}>
                                         {c.case_name}
                                     </option>
@@ -417,57 +315,8 @@ const LegalAnalysis = () => {
                     </div>
                 </div>
             )}
-            {isFileModalOpen && (
-                <div className={styles.fileModal}>
-                    <div className={styles.fileModalContent}>
-                        <h3>Attach a File</h3>
-                        <div className={styles.fileUploadSection}>
-                            <div>
-                                <h4>Legal Documents</h4>
-                                <input
-                                    type="file"
-                                    multiple
-                                    onChange={(e) => handleFileChange(e, 'legalDocuments')}
-                                />
-                                <p>{uploadedFiles.legalDocuments.length} file(s) attached</p>
-                                <ul className={styles.fileList}>
-                                    {uploadedFiles.legalDocuments.map((file, index) => (
-                                        <li key={index}>{file.name}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                            <div>
-                                <h4>Evidence</h4>
-                                <input
-                                    type="file"
-                                    multiple
-                                    onChange={(e) => handleFileChange(e, 'evidence')}
-                                />
-                                <p>{uploadedFiles.evidence.length} file(s) attached</p>
-                                <ul className={styles.fileList}>
-                                    {uploadedFiles.evidence.map((file, index) => (
-                                        <li key={index}>{file.name}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                        <div className={styles.fileModalActions}>
-                            <button onClick={handleSaveFiles}>Save</button>
-                            <button
-                                onClick={() => {
-                                    setUploadedFiles({ legalDocuments: [], evidence: [] }); // Clear files
-                                    setIsFileModalOpen(false); // Close modal
-                                }}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
         </div>
     );
 };
 
-export default LegalAnalysis;
+export default PrecedenceAnalysis;
