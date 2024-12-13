@@ -9,9 +9,11 @@ const LogInPage = () => {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
-  
+    
+    const encodedPass = 'YWRtaW4=';
+
     const handleLogIn = () => {
-        if (username === 'admin' && password === 'admin') {
+        if (username === 'admin' && password === atob(encodedPass)) {
             navigate('/portal');
         } else {
             setErrorMessage('Invalid username or password');

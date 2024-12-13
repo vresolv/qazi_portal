@@ -59,20 +59,43 @@ const Cases = () => {
         })
             .then((response) => response.json())
             .then((data) => {
-                setCases([...cases, data]); // Update state with new case
-                setNewCase({ caseNumber: '', caseName: '', type: '', daysOpen: '', status: 'Pre-litigation' }); // Reset form
-                setIsModalOpen(false); // Close modal
+                setCases([...cases, data]);
+                setNewCase({ caseNumber: '', caseName: '', type: '', daysOpen: '', status: 'Pre-litigation' });
+                setIsModalOpen(false);
             })
             .catch((error) => console.error('Error saving case:', error));
     };
 
+    // const handleDeleteCase = (id) => {
+    //     fetch(`http://localhost:5000/cases/${id}`, { method: 'DELETE' })
+    //         .then(() => {
+    //             setCases(cases.filter((c) => c.id !== id)); // Remove from state
+    //         })
+    //         .catch((error) => console.error('Error deleting case:', error));
+    // };
     const handleDeleteCase = (id) => {
         fetch(`http://localhost:5000/cases/${id}`, { method: 'DELETE' })
             .then(() => {
-                setCases(cases.filter((c) => c.id !== id)); // Remove from state
+                setCases(cases.filter((c) => c.id !== id));
+
+                const savedCase = sessionStorage.getItem('selectedCase');
+                if (savedCase) {
+                    const parsedCase = JSON.parse(savedCase);
+                    if (parsedCase.id === id) {
+                        sessionStorage.removeItem('selectedCase');
+                    }
+                }
+                const savedCaseprecedence = sessionStorage.getItem('selectedCases');
+                if (savedCaseprecedence) {
+                    const parsedCaseprecedence = JSON.parse(savedCaseprecedence);
+                    if (parsedCaseprecedence.id === id) {
+                        sessionStorage.removeItem('selectedCases');
+                    }
+                }
             })
             .catch((error) => console.error('Error deleting case:', error));
     };
+    
 
     const handleFileChange = (e, type) => {
         setUploadedFiles((prevState) => ({

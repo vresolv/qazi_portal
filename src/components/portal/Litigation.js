@@ -23,22 +23,22 @@ const Litigation = () => {
     useEffect(() => {
         const savedaiText = sessionStorage.getItem('aiText');
         const savedgeneratedText = sessionStorage.getItem('generatedResults');
-        const savedDocType = sessionStorage.getItem('isNoticeClicked');
+        // const savedDocType = sessionStorage.getItem('isNoticeClicked');
 
         if (savedaiText) setAiText(savedaiText);
         if (savedgeneratedText) setGeneratedResults(savedgeneratedText);
-        if (savedDocType) setIsNoticeClicked(savedDocType);
+        // if (savedDocType) setIsNoticeClicked(savedDocType);
     }, []);
 
     useEffect(() => {
         const saveToSessionStorage = () => {
             sessionStorage.setItem('aiText', aiText);
             sessionStorage.setItem('generatedResults', generatedResults);
-            sessionStorage.setItem('isNoticeClicked', isNoticeClicked);
+            // sessionStorage.setItem('isNoticeClicked', isNoticeClicked);
         };
     
         saveToSessionStorage();
-    }, [aiText, generatedResults,isNoticeClicked]);
+    }, [aiText, generatedResults]);
 
 
     const handleFileChange = (event) => {
@@ -96,16 +96,15 @@ const Litigation = () => {
          }
 
         if (!aiText) {
-            showNotification('Please include both Date and Address in the AI Text area.','error');
+            showNotification('Please add details !','error');
             return;
         }
         
         if (!pdfFile) {
-            showNotification('Please upload a valid PDF file.','error');
+            showNotification('Please upload a valid PDF file !','error');
             return;
         }
 
-        const documentType = isNoticeClicked ? 'Notice' : 'Other';
         setLoading(true);
         setGeneratedResults('Generating...');
             
@@ -154,22 +153,23 @@ const Litigation = () => {
                         <p>Type of Document: </p>
                     </div>
                     <button
-                        className={`${styles.noticeBtn} ${isNoticeClicked ? styles.green : ''}`}
+                        className={`${styles.noticeBtn} ${isNoticeClicked ? styles.blue : ''}`}
                         onClick={handleNoticeClick}>Notice</button>
                     <select className={styles.dropdown}>
                         <option value="option1">Summon Notice Template</option>
                     </select>
                 </div>
-                <p>AI Text Prompt</p>
+                <p>Details</p>
                 <textarea
                     className={styles.aiText}
-                    placeholder={`Date and time
-Address`}
+                    placeholder={`Name
+Address
+Date and time`}
                     value={aiText}
                     onChange={(e) => setAiText(e.target.value)}
                 ></textarea>
                 <div className={styles.buttonsArea}>
-                    <button onClick={triggerFileInput}>Upload File</button>
+                    <button onClick={triggerFileInput}>Upload Petition</button>
                     <p>{fileName}</p>
                     <input 
                         type="file"
@@ -179,11 +179,11 @@ Address`}
                         id="file-upload"/>
                     <button className={styles.genBtn} onClick={genGptResponse}>Generate</button>
                     </div>
-                    <p>Generation Results</p>
+                    <p>Generated Document</p>
                     <div
                         className={styles.aiText}
                         dangerouslySetInnerHTML={{
-                            __html: generatedResults || 'Your analysis will appear here',
+                            __html: generatedResults || '<span style="color: #888;">Your analysis will appear here...</span>',
                         }}
                     ></div>
                 <div className={styles.buttonsArea}>

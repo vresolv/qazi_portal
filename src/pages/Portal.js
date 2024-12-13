@@ -8,6 +8,7 @@ import Cases from '../components/portal/Cases';
 import dashboardIcon from '../assets/Portal/dashboard.png';
 import litigationIcon from '../assets/Portal/litigation.png';
 import legalIcon from '../assets/Portal/legal.png';
+import precedenceIcon from '../assets/Portal/precedence.png';
 import casesIcon from '../assets/Portal/cases.png';
 import settingsIcon from '../assets/Portal/settings.png';
 
@@ -37,7 +38,7 @@ const Portal = () => {
                         <p className={styles.menuButton}>Legal Analysis</p>
                     </div>
                     <div className={selectedButton === 4 ? styles.menuButtonAreaSelected : styles.menuButtonArea} onClick={() => handleMenuChange(4)}>
-                        <img className={styles.buttonIcon} src={casesIcon} alt="Logo" />
+                        <img className={styles.buttonIcon} src={precedenceIcon} alt="Logo" />
                         <p className={styles.menuButton}>Precedence Analysis</p>
                     </div>
                     <div className={selectedButton === 5 ? styles.menuButtonAreaSelected : styles.menuButtonArea} onClick={() => handleMenuChange(5)}>
