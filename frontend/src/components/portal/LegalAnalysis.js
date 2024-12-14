@@ -78,10 +78,14 @@ const LegalAnalysis = () => {
         setIsModalOpen(false);
     };
     
-    
     const handleSelectFile = (fileId) => {
         if (!fileId) {
             console.error('File ID is undefined');
+            return;
+        }
+    
+        if (!selectedCase) {
+            showNotification('Please select a case first!', 'error');
             return;
         }
     
@@ -92,12 +96,18 @@ const LegalAnalysis = () => {
             showNotification('File unselected successfully.', 'info');
             return;
         }
-        // Selecting file
-        const selectedFile = relevantFiles.find((file) => file.id === fileId);
+    
+        // Find selected file and match selected case
+        const selectedFile = relevantFiles.find(
+            (file) => file.id === fileId && file.case_name === selectedCase.case_name
+        );
+    
         if (!selectedFile) {
-            console.error('File not found in the list.');
+            showNotification('No file found for the selected case.', 'error');
+            console.error('File not found in the list or does not belong to the selected case.');
             return;
         }
+    
         const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
         fetch(`${EXPRESS_API_BASE_URL}/files/${selectedFile.file_name}`)
             .then((response) => {
@@ -116,7 +126,6 @@ const LegalAnalysis = () => {
             .catch((error) => console.error('Error selecting file:', error));
     };
     
-
 
     const handleDeleteFile = (fileId) => {
         if (!fileId) {
