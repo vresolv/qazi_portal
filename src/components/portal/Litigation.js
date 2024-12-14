@@ -58,36 +58,94 @@ const Litigation = () => {
         document.getElementById('file-upload').click();
     };
 
+    // const handleDownloadDocument = () => {
+    //     if (!generatedResults.trim()) {
+    //         showNotification('No content available in the Generated Results area.', 'error');
+    //         return;
+    //     }
+        
+    //     const doc = new jsPDF();
+    
+    //     const heading = 'Summon Notice';
+    //     doc.setFont('Helvetica', 'bold');
+    //     doc.setFontSize(16);
+    //     doc.text(heading, 105, 20, { align: 'center' });
+    //     const headingWidth = doc.getTextWidth(heading);
+    //     doc.line(105 - headingWidth / 2, 22, 105 + headingWidth / 2, 22);
+        
+    //     // paragraph
+    //     const paragraph = generatedResults.replace(/\n/g, ' ');
+    //     doc.setFont('Helvetica', 'normal');
+    //     doc.setFontSize(13);
+        
+    //     const marginX = 20;
+    //     const marginY = 40;
+    //     const pageWidth = doc.internal.pageSize.getWidth() - marginX * 2;
+    //     const textLines = doc.splitTextToSize(paragraph, pageWidth);
+        
+    //     doc.text(textLines, marginX, marginY);
+        
+    //     doc.save('SummonNotice.pdf');
+    // };
     const handleDownloadDocument = () => {
         if (!generatedResults.trim()) {
             showNotification('No content available in the Generated Results area.', 'error');
             return;
         }
-        
+    
         const doc = new jsPDF();
     
+        // Add a heading
         const heading = 'Summon Notice';
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(16);
         doc.text(heading, 105, 20, { align: 'center' });
         const headingWidth = doc.getTextWidth(heading);
         doc.line(105 - headingWidth / 2, 22, 105 + headingWidth / 2, 22);
-        
-        // paragraph
-        const paragraph = generatedResults.replace(/\n/g, ' ');
+    
+        // Paragraph content
+        const paragraph = generatedResults;
+    
+        const lines = paragraph.split('\n'); // Split the content into lines based on newlines
+        let cursorY = 40; // Starting Y position for text
+    
+        const marginX = 20;
+        const pageWidth = doc.internal.pageSize.getWidth() - marginX * 2;
+    
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(13);
-        
-        const marginX = 20;
-        const marginY = 40;
-        const pageWidth = doc.internal.pageSize.getWidth() - marginX * 2;
-        const textLines = doc.splitTextToSize(paragraph, pageWidth);
-        
-        doc.text(textLines, marginX, marginY);
-        
+    
+        lines.forEach((line) => {
+            // Check for bold markers or headers in the content
+            if (line.includes('COURT SUMMONS')) {
+                doc.setFont('Helvetica', 'bold');
+                doc.setFontSize(14);
+            } else if (line.trim() === '') {
+                // Empty line (adds a blank line for spacing)
+                cursorY += 6;
+                return;
+            } else {
+                doc.setFont('Helvetica', 'normal');
+                doc.setFontSize(13);
+            }
+    
+            // Split long lines to fit page width
+            const textLines = doc.splitTextToSize(line, pageWidth);
+    
+            // Check if we need a new page
+            if (cursorY + textLines.length * 6 > doc.internal.pageSize.getHeight() - 20) {
+                doc.addPage();
+                cursorY = 20; // Reset Y position
+            }
+    
+            // Add the text to the PDF
+            doc.text(textLines, marginX, cursorY);
+            cursorY += textLines.length * 6; // Move cursor down for next lines
+        });
+    
         doc.save('SummonNotice.pdf');
     };
-        
+    
 
     const genGptResponse = async () => {
         if (!isNoticeClicked){
@@ -114,8 +172,8 @@ const Litigation = () => {
             formData.append('details', aiText);
             formData.append('case_file', pdfFile);
                
-        
-            const response = await fetch('http://127.0.0.1:8000/legal-doc-generation/', {
+            const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/legal-doc-generation-html/`, {
                 method: 'POST',
                 body: formData,
             });
@@ -125,7 +183,29 @@ const Litigation = () => {
             }
         
             const data = await response.json();
-            setGeneratedResults(data.response || 'No results found.');
+            console.log('Response',data.response)
+            // parsing the response
+            let htmlString = data.response;
+            htmlString = htmlString.replace(/^```html\s*/, '').replace(/```$/, '');
+
+            const firstIndex = htmlString.indexOf('Court Summons');
+            if (firstIndex !== -1) {
+                htmlString = htmlString.replace(/Court Summons/g, (match, offset) => 
+                    offset === firstIndex ? match : ''
+                );
+            }
+
+            htmlString = htmlString.replace(/(\n\s*){2,}/g, '\n');
+            htmlString = htmlString.trim();
+            const lines = htmlString.split('\n');
+            const indentedLines = lines.map(line => line.trimStart());
+            htmlString = indentedLines.join('\n');
+
+            htmlString = htmlString.replace(/`{3,}/g, '');
+            const plainString = htmlString.replace(/<[^>]+>/g, '');
+
+            setGeneratedResults(plainString || 'No results found.');
+        
         } catch (error) {
             setGeneratedResults(`Failed to Fetch Results !`);
         } finally {

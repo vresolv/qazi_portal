@@ -5,12 +5,14 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+require('dotenv').config();
+
 const app = express();
 const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'qazi_ai_db',
-    password: 'test@123',
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
     port: 5432,
 });
 

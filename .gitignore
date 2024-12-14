@@ -29,3 +29,6 @@ yarn-error.log*
 !/backend/*.js
 !/backend/*.json
 
+# Ignore all .env files
+*.env
+

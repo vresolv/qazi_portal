@@ -159,7 +159,7 @@
 }
 
 .aiText {
-    width: 233%; /* Extend to cover extra space */
+    width: 233%;
     height: 34%;
     border-radius: 5px;
     font-family: 'Poppins', sans-serif;
@@ -167,7 +167,7 @@
     white-space: pre-wrap;
     border: 1px solid black;
     overflow-y: auto;
-    margin-left: -130%; /* Align with the removed Judgement Area */
+    margin-left: -130%;
 }
 .fileTable {
     width: 100%;
@@ -411,6 +411,7 @@
     color: white;
     font-family: 'Poppins', sans-serif;
     font-weight: bold;
+    font-size: 14px;
 }
 
 .fileModalActions button:first-child:hover {
@@ -426,6 +427,7 @@
     color: #333;
     font-family: 'Poppins', sans-serif;
     font-weight: bold;
+    font-size: 14px;
 }
 
 .fileModalActions button:last-child:hover {

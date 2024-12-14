@@ -27,7 +27,8 @@ const LegalAnalysis = () => {
    
     useEffect(() => {
         // Fetch cases from the backend
-        fetch('http://localhost:5000/cases')
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases`)
             .then((response) => response.json())
             .then((data) => setCases(data))
             .catch((error) => console.error('Error fetching cases:', error));
@@ -61,7 +62,8 @@ const LegalAnalysis = () => {
 
     // Fetch attched files for case
     const fetchRelevantFiles = (caseId) => {
-        fetch(`http://localhost:5000/cases/${caseId}/files`)
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases/${caseId}/files`)
             .then((response) => response.json())
             .then((data) => setRelevantFiles(data))
             .catch((error) => console.error('Error fetching files:', error));
@@ -96,8 +98,8 @@ const LegalAnalysis = () => {
             console.error('File not found in the list.');
             return;
         }
-    
-        fetch(`http://localhost:5000/files/${selectedFile.file_name}`)
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/files/${selectedFile.file_name}`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch the selected file');
@@ -121,8 +123,8 @@ const LegalAnalysis = () => {
             console.error('File ID is undefined');
             return;
         }
-    
-        fetch(`http://localhost:5000/files/${fileId}`, {
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/files/${fileId}`, {
             method: 'DELETE',
         })
             .then((response) => {
@@ -146,8 +148,9 @@ const LegalAnalysis = () => {
         const formData = new FormData();
         uploadedFiles.legalDocuments.forEach((file) => formData.append('legalDocuments', file));
         uploadedFiles.evidence.forEach((file) => formData.append('evidence', file));
-    
-        fetch(`http://localhost:5000/cases/${currentCaseId}/upload-files`, {
+        
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases/${currentCaseId}/upload-files`, {
             method: 'POST',
             body: formData,
         })
@@ -192,8 +195,9 @@ const LegalAnalysis = () => {
             if (pdfFile) {
                 formData.append('case_file', pdfFile);
             }
-    
-            const response = await fetch('http://127.0.0.1:8000/legal-analysis/', {
+            
+            const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/legal-analysis/`, {
                 method: 'POST',
                 body: formData,
             });
@@ -299,9 +303,11 @@ const LegalAnalysis = () => {
                                             <td>
                                                 <button
                                                     className={`${styles.btnTH} ${styles.view}`}
-                                                    onClick={() =>
-                                                        window.open(`http://localhost:5000/files/${file.file_name}`, '_blank')
-                                                    }
+                                                    onClick={() => {
+                                                        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+                                                        window.open(`${EXPRESS_API_BASE_URL}/files/${file.file_name}`, '_blank');
+                                                    }}
+                                                    
                                                 >
                                                     View
                                                 </button>

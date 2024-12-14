@@ -27,7 +27,8 @@ const PrecedenceAnalysis = () => {
     
     useEffect(() => {
         // Fetch cases from the backend
-        fetch('http://localhost:5000/cases')
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases`)
             .then((response) => response.json())
             .then((data) => setCases(data))
             .catch((error) => console.error('Error fetching cases:', error));
@@ -63,7 +64,8 @@ const PrecedenceAnalysis = () => {
 
     // Fetch attched files for case
     const fetchRelevantFiles = (caseId) => {
-        fetch(`http://localhost:5000/cases/${caseId}/files`)
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases/${caseId}/files`)
             .then((response) => response.json())
             .then((data) => setRelevantFiles(data))
             .catch((error) => console.error('Error fetching files:', error));
@@ -99,8 +101,8 @@ const PrecedenceAnalysis = () => {
             console.error('File not found in the list.');
             return;
         }
-    
-        fetch(`http://localhost:5000/files/${selectedFile.file_name}`)
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/files/${selectedFile.file_name}`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch the selected file');
@@ -122,8 +124,8 @@ const PrecedenceAnalysis = () => {
             console.error('File ID is undefined');
             return;
         }
-    
-        fetch(`http://localhost:5000/files/${fileId}`, {
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/files/${fileId}`, {
             method: 'DELETE',
         })
             .then((response) => {
@@ -147,8 +149,9 @@ const PrecedenceAnalysis = () => {
         const formData = new FormData();
         uploadedFiles.legalDocuments.forEach((file) => formData.append('legalDocuments', file));
         uploadedFiles.evidence.forEach((file) => formData.append('evidence', file));
-    
-        fetch(`http://localhost:5000/cases/${currentCaseId}/upload-files`, {
+        
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases/${currentCaseId}/upload-files`, {
             method: 'POST',
             body: formData,
         })
@@ -192,8 +195,9 @@ const PrecedenceAnalysis = () => {
             if (pdfFileset) {
                 formData.append('case_file', pdfFileset);
             }
-    
-            const response = await fetch('http://127.0.0.1:8000/precedence-analysis/', {
+            
+            const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+            const response = await fetch(`${API_BASE_URL}/precedence-analysis/`, {
                 method: 'POST',
                 body: formData,
             });
@@ -226,9 +230,6 @@ const PrecedenceAnalysis = () => {
             )}
             <div className={styles.subContainer}>
                 <div className={styles.caseHeader}>
-                    {/* <p className={styles.caseHeaderText}>
-                        Case Name: <span className={styles.caseName}>{caseRelevantFiles.length > 0 ? caseRelevantFiles[0].case_name : 'No Case Selected'}</span>
-                    </p> */}
                     <p className={styles.caseHeaderText}>
                         Case Name: <span className={styles.caseName}>
                             {selectedCases?.case_name || 'No Case Selected'}
@@ -271,7 +272,10 @@ const PrecedenceAnalysis = () => {
                                 </thead>
                                 <tbody>
                                     {caseRelevantFiles.map((file, index) => (
-                                        <tr key={index}>
+                                        <tr key={index}
+                                            style={{
+                                                backgroundColor: selectedFileId === file.id ? 'rgb(0, 170, 255)' : 'transparent',
+                                            }}>
                                             <td className={styles.fileNameTD}>{file.file_name}</td>
                                             <td className={styles.fileTypeTD}>{file.file_type}</td>
                                             <td>
@@ -293,9 +297,10 @@ const PrecedenceAnalysis = () => {
                                             <td>
                                                 <button
                                                     className={`${styles.btnTH} ${styles.view}`}
-                                                    onClick={() =>
-                                                        window.open(`http://localhost:5000/files/${file.file_name}`, '_blank')
-                                                    }
+                                                    onClick={() => {
+                                                        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+                                                        window.open(`${EXPRESS_API_BASE_URL}/files/${file.file_name}`, '_blank');
+                                                    }}                                                    
                                                 >
                                                     View
                                                 </button>

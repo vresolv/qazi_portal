@@ -26,7 +26,8 @@ const Cases = () => {
 
     // Fetch cases from the backend
     useEffect(() => {
-        fetch('http://localhost:5000/cases')
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases`)
             .then((response) => response.json())
             .then((data) => setCases(data))
             .catch((error) => console.error('Error fetching cases:', error));
@@ -35,7 +36,8 @@ const Cases = () => {
 
     // Fetch cases from the backend
     useEffect(() => {
-        fetch('http://localhost:5000/cases')
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases`)
             .then((response) => response.json())
             .then((data) => setCases(data))
             .catch((error) => console.error('Error fetching cases:', error));
@@ -51,8 +53,8 @@ const Cases = () => {
             showNotification('Please fill in all fields before saving!','error');
             return;
         }
-
-        fetch('http://localhost:5000/cases', {
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newCase),
@@ -66,15 +68,9 @@ const Cases = () => {
             .catch((error) => console.error('Error saving case:', error));
     };
 
-    // const handleDeleteCase = (id) => {
-    //     fetch(`http://localhost:5000/cases/${id}`, { method: 'DELETE' })
-    //         .then(() => {
-    //             setCases(cases.filter((c) => c.id !== id)); // Remove from state
-    //         })
-    //         .catch((error) => console.error('Error deleting case:', error));
-    // };
     const handleDeleteCase = (id) => {
-        fetch(`http://localhost:5000/cases/${id}`, { method: 'DELETE' })
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases/${id}`, { method: 'DELETE' })
             .then(() => {
                 setCases(cases.filter((c) => c.id !== id));
 
@@ -116,13 +112,14 @@ const Cases = () => {
         uploadedFiles.legalDocuments.forEach((file) => formData.append('legalDocuments', file));
         uploadedFiles.evidence.forEach((file) => formData.append('evidence', file));
 
-        fetch(`http://localhost:5000/cases/${currentCaseId}/upload-files`, {
+        const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+        fetch(`${EXPRESS_API_BASE_URL}/cases/${currentCaseId}/upload-files`, {
             method: 'POST',
             body: formData,
         })
             .then((response) => response.json())
             .then(() => {
-                showNotification('Files uploaded successfully!','error');
+                showNotification('Files uploaded successfully!','success');
                 setIsFileModalOpen(false);
                 setUploadedFiles({ legalDocuments: [], evidence: [] });
             })
