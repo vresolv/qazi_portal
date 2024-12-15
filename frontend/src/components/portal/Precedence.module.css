@@ -1,0 +1,453 @@
+.container {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.subContainer {
+    width: 90%;
+    height: 90%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1%;
+}
+
+.caseHeader {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    align-items: center;
+    border-radius: 20px;
+    border-color: transparent;
+    background-color: #f3f4f6;
+}
+
+.caseHeaderText{
+    color: #274464;
+    font-family: 'Poppins', sans-serif;
+    font-size: large;
+    font-weight: 500;
+    margin-left: 10px;
+}
+
+.container button {
+    background-color: #274464;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: large;
+    border-color: transparent;
+    border-radius: 10px;
+    height: 60%;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-right: 10px;
+}
+
+.caseHeaderButton {
+    margin-left: auto;
+    cursor: pointer;
+}
+
+.caseHeaderButton:hover {
+    background-color: #1b3452;
+}
+
+.areaDivider {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 5%;
+}
+
+.leftArea {
+    width: 55%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.caseArea {
+    width: 100%;
+    height: 10%;
+    display: flex;
+    align-items: center;
+}
+
+.caseHeaderText {
+    margin-right: auto;
+}
+
+.caseTableArea {
+    width: 100%;
+    height: 40%;
+    overflow-y: auto;
+    border: 2px solid #f3f4f6;
+    border-radius: 10px;
+}
+
+.addCaseFileButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #274464;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.addCaseFileButton:hover {
+    background-color: #1b3452;
+}
+
+
+.rightArea {
+    width: 45%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.caseGenTextArea{
+    width: 100%;
+    height: 5%;
+    display: flex;
+    align-items: center;
+}
+
+.caseGenText {
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    margin-left: -810px;
+    margin-top: 0px;
+}
+
+.caseName {
+    margin-left: 10px;
+}
+
+.promptText {
+    width: 99%;
+    height: 39%;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: large;
+}
+
+.promptText:focus {
+    outline: none;
+}
+
+.askQaziBtn {
+    margin-left: auto;
+    cursor: pointer;
+}
+
+.askQaziBtn:hover {
+    background-color: #1b3452;
+}
+
+.aiText {
+    width: 233%;
+    height: 34%;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: large;
+    white-space: pre-wrap;
+    border: 1px solid black;
+    overflow-y: auto;
+    margin-left: -130%;
+}
+.fileTable {
+    width: 100%;
+    border-radius: 10px;
+    border-collapse: collapse;
+}
+
+.fileNameTH {
+    width: 40%;
+    padding: 8px;
+    padding-left: 20px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: medium;
+    font-weight: 300;
+}
+
+.fileNameTD {
+    padding: 8px;
+    padding-left: 20px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    border-radius: 5px;
+    color: #274464;
+    font-family: 'Poppins', sans-serif;
+    font-size: medium;
+    font-weight: 600;
+}
+
+.fileTypeTH {
+    width: 25%;
+    padding: 8px;
+    padding-left: 20px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: medium;
+    font-weight: 300;
+}
+
+.fileTypeTD {
+    width: 25%;
+    padding: 8px;
+    padding-left: 20px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: medium;
+    font-weight: 400;
+}
+
+
+.fileNameText {
+    max-width: 390px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 18px;
+    color: #333;
+    font-weight: 500;
+}
+
+
+.btnTH {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #333333;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btnTH.delete {
+    width: auto;
+}
+
+.btnTH.delete:hover {
+    background-color: #f4dccb;
+}
+
+.btnTH.view {
+    width: auto;
+}
+
+.btnTH.view:hover {
+    background-color: #f4dccb;
+}
+
+.fileTable th {
+    background-color: #f3f4f6;
+}
+
+.fileTable button {
+    background-color: white;
+    color: #c5a683
+} 
+
+.fileUpload {
+    display: none;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.modalContent h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.modalContent label {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modalContent select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.modalActions button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.modalActions button:first-child {
+    background-color: #274464;
+    color: white;
+}
+
+.modalActions button:first-child:hover {
+    background-color: #1f2f3f;
+}
+
+.modalActions button:last-child {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.modalActions button:last-child:hover {
+    background-color: #e0e0e0;
+}
+
+.fileModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.fileModalContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 600px;
+    max-width: 90%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.fileUploadSection {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: -30px;
+}
+
+.fileUploadColumn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fileModalActions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.fileModalActions button:first-child {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #274464;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.fileModalActions button:first-child:hover {
+    background-color: #1b3452;
+}
+
+.fileModalActions button:last-child {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #f4f4f4;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.fileModalActions button:last-child:hover {
+    background-color: #e0e0e0;
+}
+
+.fileList {
+    font-size: 14px;
+    margin-top: 5px;
+    list-style: disc;
+    padding-left: 20px;
+}
+
+.fileList li {
+    margin: 2px 0;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+.placeholder {
+    color: #888;
+}
+

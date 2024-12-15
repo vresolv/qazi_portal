@@ -1,0 +1,58 @@
+.container {
+    height: 100vh;
+    background-color: white;
+    background-image: url('../assets/HomePage/Qazi_backgorund.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.subContainer {
+    width: 50%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5%;
+    margin-right: 5%;
+}
+
+.subContainer img{
+    width: 60%;
+}
+
+.features {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    padding-left: 17%; 
+    font-weight: bold;
+    font-size: 20px;
+    color: #274464;
+}
+
+
+.dividerCircle {
+    width: 10px;
+    height: 10px;
+    background-color: #c5a683;
+    border-radius: 50%;
+}
+
+.loginBtn {
+    width: 25%;
+    height: 10%;
+    border-radius: 20px;
+    border-color: transparent;
+    font-weight: bold;
+    font-size: x-large;
+    background-color: #c5a683;
+    color: white;
+    margin-left: auto;
+    margin-right: 34%;
+}

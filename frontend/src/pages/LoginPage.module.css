@@ -1,0 +1,74 @@
+.container {
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: black;
+}
+
+.container video {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    object-fit: cover;
+    z-index: 0;
+    opacity: .2;
+  }
+
+.subContainer {
+    z-index: 1;
+    position: relative;
+    width: 50%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10%;
+}
+
+.subContainer img{
+    width: 50%;
+}
+
+.loginBtn {
+    width: 25%;
+    height: 60px;
+    border-radius: 20px;
+    border-color: transparent;
+    font-weight: bold;
+    font-size: x-large;
+    background-color: #c5a683;
+    color: white;
+    display: inline-block;
+    line-height: normal;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.inputBox {
+    width: 40%;
+    padding: 10px;
+    font-weight: bold;
+    font-size: large;
+    border-radius: 15px;
+}
+
+.errorContainer {
+    min-height: 20px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+}
+
+
+.inputBox:focus {
+    outline: none;
+}
