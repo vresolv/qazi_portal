@@ -4,6 +4,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const fsys = require('fs').promises;
 
 require('dotenv').config();
 
@@ -16,7 +17,7 @@ const pool = new Pool({
     port: 5432,
 });
 
-// Configure multer for file uploads
+// multer for file uploads
 const upload = multer({
     dest: path.join(__dirname, 'uploads'),
 });
@@ -55,20 +56,40 @@ app.post('/cases', async (req, res) => {
 // Delete case and related files
 app.delete('/cases/:id', async (req, res) => {
     const { id } = req.params;
+
     try {
         await pool.query('BEGIN');
+
+        const result = await pool.query(
+            'SELECT file_path FROM uploaded_files WHERE case_id = $1',
+            [id]
+        );
+
+        const filePaths = result.rows.map(row => row.file_path);
+
+        // Deleting from disk
+        for (const filePath of filePaths) {
+            try {
+                await fsys.unlink(filePath); // Deleting each file
+                console.log(`File deleted: ${filePath}`);
+            } catch (err) {
+                console.error(`Error deleting file ${filePath}:`, err.message);
+            }
+        }
+        // Deleting from db
         await pool.query('DELETE FROM uploaded_files WHERE case_id = $1', [id]);
         await pool.query('DELETE FROM cases WHERE id = $1', [id]);
-        await pool.query('COMMIT');
 
+        await pool.query('COMMIT');
         res.json({ message: 'Case and related files deleted successfully' });
     } catch (err) {
-        console.error(err.message);
+        console.error('Error deleting case and files:', err.message);
 
         await pool.query('ROLLBACK');
-        res.status(500).send('Server Error');
+        res.status(500).json({ message: 'Server error during deletion' });
     }
 });
+
 
 // handling litigation data
 
@@ -112,7 +133,7 @@ app.post(
         const { id } = req.params;
 
         try {
-            // Fetch the case_name from the cases table using the case_id
+            // Fetching case_name from the cases table using the case_id
             const caseResult = await pool.query('SELECT case_name FROM cases WHERE id = $1', [id]);
 
             if (caseResult.rows.length === 0) {
@@ -130,13 +151,13 @@ app.post(
                             file_type: type,
                             file_name: file.originalname,
                             file_path: file.path,
-                            case_name: caseName, // Add the case_name here
+                            case_name: caseName,
                         });
                     });
                 }
             });
 
-            // Insert file details into the database
+            // Inserting file details into the database
             const insertPromises = files.map((file) =>
                 pool.query(
                     'INSERT INTO uploaded_files (case_id, file_type, file_name, file_path, case_name) VALUES ($1, $2, $3, $4, $5)',
@@ -170,21 +191,21 @@ app.get('/cases/:id/files', async (req, res) => {
 });
 
 
-// Serve files to viewed or get downloaded
-app.get('/files/:fileName', async (req, res) => {
-    const { fileName } = req.params;
+// Selecting files for API response or downloaing
+app.get('/files/:id', async (req, res) => {
+    const { id } = req.params;
 
     try {
-        const result = await pool.query('SELECT file_path FROM uploaded_files WHERE file_name = $1', [fileName]);
+        const result = await pool.query('SELECT file_path, file_name FROM uploaded_files WHERE id = $1', [id]);
 
         if (result.rows.length === 0) {
             return res.status(404).send('File not found');
         }
 
-        const filePath = result.rows[0].file_path;
+        const { file_path: filePath, file_name: fileName } = result.rows[0];
 
         if (!fs.existsSync(filePath)) {
-            return res.status(404).send('File not found');
+            return res.status(404).send('File not found on the server');
         }
 
         res.download(filePath, fileName, (err) => {
@@ -199,6 +220,7 @@ app.get('/files/:fileName', async (req, res) => {
     }
 });
 
+// Deleting files individually
 app.delete('/files/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -207,6 +229,7 @@ app.delete('/files/:id', async (req, res) => {
     }
 
     try {
+        // Fetch file path from database
         const fileResult = await pool.query(
             'SELECT file_path FROM uploaded_files WHERE id = $1',
             [id]
@@ -217,22 +240,24 @@ app.delete('/files/:id', async (req, res) => {
             return res.status(404).json({ message: 'File not found' });
         }
 
+        // Delete the file from database
         await pool.query('DELETE FROM uploaded_files WHERE id = $1', [id]);
 
-        const fs = require('fs');
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                console.error('Error deleting file from disk:', err);
-            }
-        });
+        // Delete the file from disk
+        try {
+            await fsys.unlink(filePath);
+            console.log(`File deleted successfully: ${filePath}`);
+        } catch (unlinkError) {
+            console.error('Error deleting file from disk:', unlinkError);
+            return res.status(500).json({ message: 'File deleted from database, but not from disk' });
+        }
 
-        res.json({ message: 'File deleted successfully' });
+        res.json({ message: 'File deleted successfully from database and disk' });
     } catch (err) {
         console.error('Error deleting file:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });
-
 
 
 const PORT = 5000;

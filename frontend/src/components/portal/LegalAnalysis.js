@@ -78,6 +78,53 @@ const LegalAnalysis = () => {
         setIsModalOpen(false);
     };
     
+    // const handleSelectFile = (fileId) => {
+    //     if (!fileId) {
+    //         console.error('File ID is undefined');
+    //         return;
+    //     }
+    
+    //     if (!selectedCase) {
+    //         showNotification('Please select a case first!', 'error');
+    //         return;
+    //     }
+    
+    //     if (selectedFileId === fileId) {
+    //         setSelectedFileId(null);
+    //         setPdfFile(null);
+    //         setFileName('');
+    //         showNotification('File unselected successfully.', 'info');
+    //         return;
+    //     }
+    
+    //     // Find selected file and match selected case
+    //     const selectedFile = relevantFiles.find(
+    //         (file) => file.id === fileId && file.case_name === selectedCase.case_name
+    //     );
+    
+    //     if (!selectedFile) {
+    //         showNotification('No file found for the selected case.', 'error');
+    //         console.error('File not found in the list or does not belong to the selected case.');
+    //         return;
+    //     }
+    
+    //     const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+    //     fetch(`${EXPRESS_API_BASE_URL}/files/${selectedFile.file_name}`)
+    //         .then((response) => {
+    //             if (!response.ok) {
+    //                 throw new Error('Failed to fetch the selected file');
+    //             }
+    //             return response.blob();
+    //         })
+    //         .then((blob) => {
+    //             const file = new File([blob], selectedFile.file_name, { type: selectedFile.file_type });
+    //             setPdfFile(file);
+    //             setFileName(file.name);
+    //             setSelectedFileId(fileId);
+    //             showNotification(`File "${file.name}" selected successfully.`, 'success');
+    //         })
+    //         .catch((error) => console.error('Error selecting file:', error));
+    // };
     const handleSelectFile = (fileId) => {
         if (!fileId) {
             console.error('File ID is undefined');
@@ -97,19 +144,17 @@ const LegalAnalysis = () => {
             return;
         }
     
-        // Find selected file and match selected case
-        const selectedFile = relevantFiles.find(
-            (file) => file.id === fileId && file.case_name === selectedCase.case_name
-        );
+        // Find the file using its unique ID
+        const selectedFile = relevantFiles.find((file) => file.id === fileId);
     
         if (!selectedFile) {
             showNotification('No file found for the selected case.', 'error');
-            console.error('File not found in the list or does not belong to the selected case.');
+            console.error('File not found in the list.');
             return;
         }
     
         const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
-        fetch(`${EXPRESS_API_BASE_URL}/files/${selectedFile.file_name}`)
+        fetch(`${EXPRESS_API_BASE_URL}/files/${fileId}`) // Fetch file using its ID
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch the selected file');
@@ -241,9 +286,6 @@ const LegalAnalysis = () => {
             )}
             <div className={styles.subContainer}>
                 <div className={styles.caseHeader}>
-                    {/* <p className={styles.caseHeaderText}>
-                        Case Name: <span className={styles.caseName}>{relevantFiles.length > 0 ? relevantFiles[0].case_name : 'No Case Selected'}</span>
-                    </p> */}
                     <p className={styles.caseHeaderText}>
                         Case Name: <span className={styles.caseName}>
                             {selectedCase?.case_name || 'No Case Selected'}
@@ -259,6 +301,7 @@ const LegalAnalysis = () => {
                 </div>
                 <div className={styles.areaDivider}>
                     <div className={styles.leftArea}>
+                        
                         <div className={styles.caseArea}>
                             <p className={styles.caseHeaderText}>Relevant Case Files</p>
                             <button
@@ -281,6 +324,7 @@ const LegalAnalysis = () => {
                                     <tr>
                                         <th className={styles.fileNameTH}>FILE NAME</th>
                                         <th className={styles.fileTypeTH}>TYPE</th>
+                                        <th className={styles.btnTH}></th>
                                         <th className={styles.btnTH}></th>
                                         <th className={styles.btnTH}></th>
                                     </tr>
@@ -314,7 +358,7 @@ const LegalAnalysis = () => {
                                                     className={`${styles.btnTH} ${styles.view}`}
                                                     onClick={() => {
                                                         const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
-                                                        window.open(`${EXPRESS_API_BASE_URL}/files/${file.file_name}`, '_blank');
+                                                        window.open(`${EXPRESS_API_BASE_URL}/files/${file.id}`, '_blank');
                                                     }}
                                                     
                                                 >
@@ -326,6 +370,12 @@ const LegalAnalysis = () => {
                                 </tbody>
                             </table>
                         </div>
+                        <br/>
+                        <br/>
+                        <div className={styles.caseGenTextArea}>
+                            <p className={styles.caseGenText}>Qazi Says</p>
+                        </div>
+                        <div className={styles.aiText}>{analysisResult || <span className={styles.placeholder}>Your analysis will appear here...</span>}</div>
                     </div>
                     <div className={styles.rightArea}>
                         <div className={styles.caseArea}>
@@ -346,10 +396,6 @@ You can also select a relevant case file from the file section on the left to in
                                 Ask Qazi
                             </button>
                         </div>
-                        <div className={styles.caseGenTextArea}>
-                            <p className={styles.caseGenText}>Qazi Says</p>
-                        </div>
-                        <div className={styles.aiText}>{analysisResult || <span className={styles.placeholder}>Your analysis will appear here...</span>}</div>
                     </div>
                 </div>
             </div>
@@ -363,7 +409,7 @@ You can also select a relevant case file from the file section on the left to in
                                 onChange={(e) => {
                                     const selectedId = e.target.value;
                                     const selected = cases.find((c) => c.id === parseInt(selectedId, 10));
-                                    setTempSelectedCase(selected); // Use temporary state
+                                    setTempSelectedCase(selected);
                                 }}
                                 defaultValue=""
                             >

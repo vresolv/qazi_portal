@@ -123,14 +123,14 @@
     height: 5%;
     display: flex;
     align-items: center;
+    
 }
 
 .caseGenText {
     border-radius: 5px;
     font-family: 'Poppins', sans-serif;
     font-size: 20px;
-    margin-left: -810px;
-    margin-top: 0px;
+    align-items: left;
 }
 
 .caseName {
@@ -159,7 +159,7 @@
 }
 
 .aiText {
-    width: 233%;
+    width: 191%;
     height: 34%;
     border-radius: 5px;
     font-family: 'Poppins', sans-serif;
@@ -167,8 +167,9 @@
     white-space: pre-wrap;
     border: 1px solid black;
     overflow-y: auto;
-    margin-left: -130%;
+    margin-left: auto;
 }
+
 .fileTable {
     width: 100%;
     border-radius: 10px;

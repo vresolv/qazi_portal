@@ -81,6 +81,53 @@ const PrecedenceAnalysis = () => {
     };
 
 
+    // const handleSelectFile = (fileId) => {
+    //     if (!fileId) {
+    //         console.error('File ID is undefined');
+    //         return;
+    //     }
+    
+    //     if (!selectedCases) {
+    //         showNotification('Please select a case first!', 'error');
+    //         return;
+    //     }
+    
+    //     if (selectedFileId === fileId) {
+    //         setSelectedFileId(null);
+    //         setPdfFile(null);
+    //         setFileName('');
+    //         showNotification('File unselected successfully.', 'info');
+    //         return;
+    //     }
+    
+    //     // Find selected file and match selected case
+    //     const selectedFile = caseRelevantFiles.find(
+    //         (file) => file.id === fileId && file.case_name === selectedCases.case_name
+    //     );
+    
+    //     if (!selectedFile) {
+    //         showNotification('No file found for the selected case.', 'error');
+    //         console.error('File not found in the list or does not belong to the selected case.');
+    //         return;
+    //     }
+    
+    //     const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
+    //     fetch(`${EXPRESS_API_BASE_URL}/files/${selectedFile.file_name}`)
+    //         .then((response) => {
+    //             if (!response.ok) {
+    //                 throw new Error('Failed to fetch the selected file');
+    //             }
+    //             return response.blob();
+    //         })
+    //         .then((blob) => {
+    //             const file = new File([blob], selectedFile.file_name, { type: selectedFile.file_type });
+    //             setPdfFile(file);
+    //             setFileName(file.name);
+    //             setSelectedFileId(fileId);
+    //             showNotification(`File "${file.name}" selected successfully.`, 'success');
+    //         })
+    //         .catch((error) => console.error('Error selecting file:', error));
+    // };
     const handleSelectFile = (fileId) => {
         if (!fileId) {
             console.error('File ID is undefined');
@@ -100,19 +147,17 @@ const PrecedenceAnalysis = () => {
             return;
         }
     
-        // Find selected file and match selected case
-        const selectedFile = caseRelevantFiles.find(
-            (file) => file.id === fileId && file.case_name === selectedCases.case_name
-        );
+        // Fetching file using its unique ID
+        const selectedFile = caseRelevantFiles.find((file) => file.id === fileId);
     
         if (!selectedFile) {
             showNotification('No file found for the selected case.', 'error');
-            console.error('File not found in the list or does not belong to the selected case.');
+            console.error('File not found in the list.');
             return;
         }
     
         const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
-        fetch(`${EXPRESS_API_BASE_URL}/files/${selectedFile.file_name}`)
+        fetch(`${EXPRESS_API_BASE_URL}/files/${fileId}`) // Fetch file using its ID
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch the selected file');
@@ -128,7 +173,6 @@ const PrecedenceAnalysis = () => {
             })
             .catch((error) => console.error('Error selecting file:', error));
     };
-    
 
     const handleDeleteFile = (fileId) => {
         if (!fileId) {
@@ -279,6 +323,7 @@ const PrecedenceAnalysis = () => {
                                         <th className={styles.fileTypeTH}>TYPE</th>
                                         <th className={styles.btnTH}></th>
                                         <th className={styles.btnTH}></th>
+                                        <th className={styles.btnTH}></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -310,7 +355,7 @@ const PrecedenceAnalysis = () => {
                                                     className={`${styles.btnTH} ${styles.view}`}
                                                     onClick={() => {
                                                         const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
-                                                        window.open(`${EXPRESS_API_BASE_URL}/files/${file.file_name}`, '_blank');
+                                                        window.open(`${EXPRESS_API_BASE_URL}/files/${file.id}`, '_blank');
                                                     }}                                                    
                                                 >
                                                     View
@@ -321,6 +366,12 @@ const PrecedenceAnalysis = () => {
                                 </tbody>
                             </table>
                         </div>
+                        <br/>
+                        <br/>
+                        <div className={styles.caseGenTextArea}>
+                            <p className={styles.caseGenText}>Qazi Says</p>
+                        </div>
+                        <div className={styles.aiText}>{precedenceAnalysis || <span className={styles.placeholder}>Your analysis will appear here...</span>}</div>
                     </div>
                     <div className={styles.rightArea}>
                         <div className={styles.caseArea}>
@@ -341,10 +392,6 @@ You can also select a relevant case file from the file section on the left to in
                                 Ask Qazi
                             </button>
                         </div>
-                        <div className={styles.caseGenTextArea}>
-                            <p className={styles.caseGenText}>Qazi Says</p>
-                        </div>
-                        <div className={styles.aiText}>{precedenceAnalysis || <span className={styles.placeholder}>Your analysis will appear here...</span>}</div>
                     </div>
                 </div>
             </div>
