@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { jsPDF } from 'jspdf';
 import styles from './Precedence.module.css';
 import Notification from './Notification';
 
@@ -81,53 +80,6 @@ const PrecedenceAnalysis = () => {
     };
 
 
-    // const handleSelectFile = (fileId) => {
-    //     if (!fileId) {
-    //         console.error('File ID is undefined');
-    //         return;
-    //     }
-    
-    //     if (!selectedCases) {
-    //         showNotification('Please select a case first!', 'error');
-    //         return;
-    //     }
-    
-    //     if (selectedFileId === fileId) {
-    //         setSelectedFileId(null);
-    //         setPdfFile(null);
-    //         setFileName('');
-    //         showNotification('File unselected successfully.', 'info');
-    //         return;
-    //     }
-    
-    //     // Find selected file and match selected case
-    //     const selectedFile = caseRelevantFiles.find(
-    //         (file) => file.id === fileId && file.case_name === selectedCases.case_name
-    //     );
-    
-    //     if (!selectedFile) {
-    //         showNotification('No file found for the selected case.', 'error');
-    //         console.error('File not found in the list or does not belong to the selected case.');
-    //         return;
-    //     }
-    
-    //     const EXPRESS_API_BASE_URL = process.env.REACT_APP_EXPRESS_API_BASE_URL;
-    //     fetch(`${EXPRESS_API_BASE_URL}/files/${selectedFile.file_name}`)
-    //         .then((response) => {
-    //             if (!response.ok) {
-    //                 throw new Error('Failed to fetch the selected file');
-    //             }
-    //             return response.blob();
-    //         })
-    //         .then((blob) => {
-    //             const file = new File([blob], selectedFile.file_name, { type: selectedFile.file_type });
-    //             setPdfFile(file);
-    //             setFileName(file.name);
-    //             setSelectedFileId(fileId);
-    //             showNotification(`File "${file.name}" selected successfully.`, 'success');
-    //         })
-    //         .catch((error) => console.error('Error selecting file:', error));
-    // };
     const handleSelectFile = (fileId) => {
         if (!fileId) {
             console.error('File ID is undefined');

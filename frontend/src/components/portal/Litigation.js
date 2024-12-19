@@ -23,18 +23,15 @@ const Litigation = () => {
     useEffect(() => {
         const savedaiText = sessionStorage.getItem('aiText');
         const savedgeneratedText = sessionStorage.getItem('generatedResults');
-        // const savedDocType = sessionStorage.getItem('isNoticeClicked');
 
         if (savedaiText) setAiText(savedaiText);
         if (savedgeneratedText) setGeneratedResults(savedgeneratedText);
-        // if (savedDocType) setIsNoticeClicked(savedDocType);
     }, []);
 
     useEffect(() => {
         const saveToSessionStorage = () => {
             sessionStorage.setItem('aiText', aiText);
             sessionStorage.setItem('generatedResults', generatedResults);
-            // sessionStorage.setItem('isNoticeClicked', isNoticeClicked);
         };
     
         saveToSessionStorage();
@@ -58,35 +55,7 @@ const Litigation = () => {
         document.getElementById('file-upload').click();
     };
 
-    // const handleDownloadDocument = () => {
-    //     if (!generatedResults.trim()) {
-    //         showNotification('No content available in the Generated Results area.', 'error');
-    //         return;
-    //     }
-        
-    //     const doc = new jsPDF();
-    
-    //     const heading = 'Summon Notice';
-    //     doc.setFont('Helvetica', 'bold');
-    //     doc.setFontSize(16);
-    //     doc.text(heading, 105, 20, { align: 'center' });
-    //     const headingWidth = doc.getTextWidth(heading);
-    //     doc.line(105 - headingWidth / 2, 22, 105 + headingWidth / 2, 22);
-        
-    //     // paragraph
-    //     const paragraph = generatedResults.replace(/\n/g, ' ');
-    //     doc.setFont('Helvetica', 'normal');
-    //     doc.setFontSize(13);
-        
-    //     const marginX = 20;
-    //     const marginY = 40;
-    //     const pageWidth = doc.internal.pageSize.getWidth() - marginX * 2;
-    //     const textLines = doc.splitTextToSize(paragraph, pageWidth);
-        
-    //     doc.text(textLines, marginX, marginY);
-        
-    //     doc.save('SummonNotice.pdf');
-    // };
+   
     const handleDownloadDocument = () => {
         if (!generatedResults.trim()) {
             showNotification('No content available in the Generated Results area.', 'error');
@@ -95,7 +64,7 @@ const Litigation = () => {
     
         const doc = new jsPDF();
     
-        // Add a heading
+        // heading
         const heading = 'Summon Notice';
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(16);
@@ -103,11 +72,10 @@ const Litigation = () => {
         const headingWidth = doc.getTextWidth(heading);
         doc.line(105 - headingWidth / 2, 22, 105 + headingWidth / 2, 22);
     
-        // Paragraph content
         const paragraph = generatedResults;
     
-        const lines = paragraph.split('\n'); // Split the content into lines based on newlines
-        let cursorY = 40; // Starting Y position for text
+        const lines = paragraph.split('\n');
+        let cursorY = 40;
     
         const marginX = 20;
         const pageWidth = doc.internal.pageSize.getWidth() - marginX * 2;
@@ -116,12 +84,10 @@ const Litigation = () => {
         doc.setFontSize(13);
     
         lines.forEach((line) => {
-            // Check for bold markers or headers in the content
             if (line.includes('COURT SUMMONS')) {
                 doc.setFont('Helvetica', 'bold');
                 doc.setFontSize(14);
             } else if (line.trim() === '') {
-                // Empty line (adds a blank line for spacing)
                 cursorY += 6;
                 return;
             } else {
@@ -129,18 +95,15 @@ const Litigation = () => {
                 doc.setFontSize(13);
             }
     
-            // Split long lines to fit page width
             const textLines = doc.splitTextToSize(line, pageWidth);
     
-            // Check if we need a new page
             if (cursorY + textLines.length * 6 > doc.internal.pageSize.getHeight() - 20) {
                 doc.addPage();
-                cursorY = 20; // Reset Y position
+                cursorY = 20;
             }
     
-            // Add the text to the PDF
             doc.text(textLines, marginX, cursorY);
-            cursorY += textLines.length * 6; // Move cursor down for next lines
+            cursorY += textLines.length * 6;
         });
     
         doc.save('SummonNotice.pdf');
